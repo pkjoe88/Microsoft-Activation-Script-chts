@@ -120,10 +120,10 @@ set "selfgit=ht%blank%tps%blank%://git.acti%blank%vated.win/Micr%blank%osoft-Act
 sc query Null | find /i "RUNNING"
 if %errorlevel% NEQ 0 (
 echo:
-echo Null service is not running, script may crash...
+echo Null 服務未執行，腳本可能會當機...
 echo:
 echo:
-echo Check this webpage for help - %mas%fix_service
+echo 請查看此網頁尋求協助 - %mas%fix_service
 echo:
 echo:
 ping 127.0.0.1 -n 20
@@ -134,10 +134,10 @@ cls
 
 >nul findstr /v "$" "%_cmdf%" && (
 echo:
-echo Error - Script either has LF line ending issue or an empty line at the end of the script is missing.
+echo 錯誤 - 腳本的換行格式有 LF 問題，或腳本結尾缺少一行空行。
 echo:
 echo:
-echo Check this webpage for help - %mas%troubleshoot
+echo 請查看此網頁尋求協助 - %mas%troubleshoot
 echo:
 echo:
 ping 127.0.0.1 -n 20 >nul
@@ -148,7 +148,7 @@ exit /b
 
 cls
 color 07
-title  HWID Activation %masver%
+title  HWID 啟用 %masver%
 
 set _args=
 set _elev=
@@ -174,19 +174,19 @@ call :dk_setvar
 
 if %winbuild% EQU 1 (
 %eline%
-echo Failed to detect Windows build number.
+echo 無法偵測 Windows 組建編號。
 echo:
 setlocal EnableDelayedExpansion
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
 if exist "%Systemdrive%\Users\WDAGUtilityAccount" (
 sc query gcs | find /i "RUNNING" %nul% && (
 %eline%
-echo Windows Sandbox detected; activation is not supported.
-echo The script cannot run due to missing licensing components. Aborting...
+echo 偵測到 Windows Sandbox；不支援啟用。
+echo 系統缺少授權元件，腳本無法執行。正在中止...
 echo:
 goto dk_done
 )
@@ -194,16 +194,16 @@ goto dk_done
 
 if %winbuild% LSS 10240 (
 %eline%
-echo Unsupported OS version detected [%winbuild%].
-echo HWID Activation is only supported on Windows 10/11.
-call :dk_color %Blue% "Use TSforge activation option from the main menu."
+echo 偵測到不支援的作業系統版本 [%winbuild%]。
+echo 僅支援在 Windows 10/11 上使用 HWID 啟用。
+call :dk_color %Blue% "請從主選單使用 TSforge 啟用選項。"
 goto dk_done
 )
 
 if exist "%SystemRoot%\Servicing\Packages\Microsoft-Windows-Server*Edition~*.mum" (
 %eline%
-echo HWID Activation is not supported on Windows Server.
-call :dk_color %Blue% "Use TSforge activation option from the main menu."
+echo Windows Server 不支援 HWID 啟用。
+call :dk_color %Blue% "請從主選單使用 TSforge 啟用選項。"
 goto dk_done
 )
 
@@ -228,10 +228,10 @@ setlocal EnableDelayedExpansion
 echo "!_cmdf!" | find /i "!_ttemp!" %nul1% && (
 if /i not "!_work!"=="!_ttemp!" (
 %eline%
-echo The script was launched from the temp folder.
-echo You are most likely running the script directly from the archive file.
+echo 腳本是從暫存資料夾啟動的。
+echo 您很可能是直接在壓縮檔內執行腳本。
 echo:
-echo Extract the archive file and launch the script from the extracted folder.
+echo 請先解壓縮檔案，再從解壓後的資料夾啟動腳本。
 goto dk_done
 )
 )
@@ -243,8 +243,8 @@ goto dk_done
 %nul1% fltmc || (
 if not defined _elev %psc% "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
 %eline%
-echo This script needs admin rights.
-echo Right click on this script and select 'Run as administrator'.
+echo 此腳本需要系統管理員權限。
+echo 請以滑鼠右鍵按一下此腳本，然後選擇「以系統管理員身分執行」。
 goto dk_done
 )
 
@@ -254,31 +254,31 @@ goto dk_done
 
 ::pstst $ExecutionContext.SessionState.LanguageMode :pstst
 
-for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!') -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
+for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
 
 if /i not "%tstresult%"=="FullLanguage" (
 %eline%
 for /f "delims=" %%a in ('%psc% "$ExecutionContext.SessionState.LanguageMode" %nul6%') do (set tstresult2=%%a)
-echo Test 1 - %tstresult%
-echo Test 2 - !tstresult2!
+echo 測試 1 - %tstresult%
+echo 測試 2 - !tstresult2!
 echo:
 
 REM check LanguageMode
 
 echo: !tstresult2! | findstr /i "ConstrainedLanguage RestrictedLanguage NoLanguage" %nul1% && (
-echo FullLanguage mode not found in PowerShell. Aborting...
-echo If you have applied restrictions on Powershell then undo those changes.
+echo PowerShell 未處於 FullLanguage 模式。正在中止...
+echo 如果您曾對 PowerShell 套用限制，請先復原那些變更。
 set fixes=%fixes% %mas%fix_powershell
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%fix_powershell"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%fix_powershell"
 goto dk_done
 )
 
 REM check Powershell core version
 
 cmd /c "%psc% "$PSVersionTable.PSEdition"" | find /i "Core" %nul1% && (
-echo Windows Powershell is needed for MAS but it seems to be replaced with Powershell core. Aborting...
+echo MAS 需要 Windows PowerShell，但系統中的 PowerShell 似乎已被 PowerShell Core 取代。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 
@@ -286,9 +286,9 @@ REM check for Mal-ware that may cause issues with Powershell
 
 for /r "%ProgramFiles%\" %%f in (secureboot.exe) do if exist "%%f" (
 echo "%%f"
-echo Mal%blank%ware found, PowerShell is not working properly.
+echo 偵測到惡意軟體，PowerShell 無法正常運作。
 set fixes=%fixes% %mas%remove_mal%w%ware
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%remove_mal%w%ware"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%remove_mal%w%ware"
 goto dk_done
 )
 
@@ -297,29 +297,29 @@ REM check if .NET is working properly
 if /i "!tstresult2!"=="FullLanguage" (
 cmd /c "%psc% ""try {[System.AppDomain]::CurrentDomain.GetAssemblies(); [System.Math]::Sqrt(144)} catch {Exit 3}""" %nul%
 if !errorlevel!==3 (
-echo Windows Powershell failed to load .NET command. Aborting...
+echo Windows PowerShell 無法載入 .NET 命令。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 )
 
 REM check antivirus and other errors
 
-echo PowerShell is not working properly. Aborting...
+echo PowerShell 無法正常運作。正在中止...
 
 if /i "!tstresult2!"=="FullLanguage" (
 echo:
-echo Your antivirus software might be blocking the script.
+echo 您的防毒軟體可能封鎖了此腳本。
 echo:
 sc query sense | find /i "RUNNING" %nul% && (
-echo Installed Antivirus - Microsoft Defender for Endpoint
+echo 已安裝的防毒軟體 - Microsoft Defender for Endpoint
 )
 cmd /c "%psc% ""$av = Get-WmiObject -Namespace root\SecurityCenter2 -Class AntiVirusProduct; $n = @(); foreach ($i in $av) { $n += $i.displayName }; if ($n) { Write-Host ('Installed Antivirus - ' + ($n -join ', '))}"""
 )
 
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
@@ -390,14 +390,14 @@ if not "%%C"=="" set old=
 if defined old (
 echo ________________________________________________
 %eline%
-echo Your version of MAS [%masver%] is outdated.
+echo 您的 MAS 版本 [%masver%] 已過期。
 echo ________________________________________________
 echo:
 if not %_unattended%==1 (
-echo [1] Get Latest MAS
-echo [0] Continue Anyway
+echo [1] 取得最新版 MAS
+echo [0] 仍要繼續
 echo:
-call :dk_color %_Green% "Choose a menu option using your keyboard [1,0] :"
+call :dk_color %_Green% "請以鍵盤選擇選單選項 [1,0]："
 choice /C:10 /N
 if !errorlevel!==2 rem
 if !errorlevel!==1 (start %selfgit% & start %github% & start %mas% & exit /b)
@@ -411,10 +411,10 @@ if not defined terminal (
 mode 110, 34
 if exist "%SysPath%\spp\store_test\" mode 134, 34
 )
-title  HWID Activation %masver%
+title  HWID 啟用 %masver%
 
 echo:
-echo Initializing...
+echo 正在初始化...
 echo:
 
 for %%# in (
@@ -423,13 +423,13 @@ ClipUp.exe
 ) do (
 if not exist %SysPath%\%%# (
 %eline%
-echo [%SysPath%\%%#] file is missing, aborting...
+echo 檔案 [%SysPath%\%%#] 遺失，正在中止...
 echo:
 if not defined results (
-call :dk_color %Blue% "Go back to Main Menu, select Troubleshoot and run DISM Restore and SFC Scan options."
-call :dk_color %Blue% "After that, restart system and try activation again."
+call :dk_color %Blue% "請回到主選單，選擇疑難排解，然後執行 DISM 還原與 SFC 掃描選項。"
+call :dk_color %Blue% "完成後重新啟動系統，再重新嘗試啟用。"
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "If it still shows the same error, do this - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "如果仍出現相同錯誤，請這樣做 - " %_Yellow% " %mas%in-place_repair_upgrade"
 )
 goto dk_done
 )
@@ -454,11 +454,11 @@ if defined _perm (
 cls
 echo ___________________________________________________________________________________________
 echo:
-call :dk_color2 %_White% "     " %Green% "%winos% is already permanently activated."
+call :dk_color2 %_White% "     " %Green% "%winos% 已永久啟用。"
 echo ___________________________________________________________________________________________
 if %_unattended%==1 goto dk_done
 echo:
-choice /C:10 /N /M ">    [1] Activate Anyway [0] %_exitmsg% : "
+choice /C:10 /N /M ">    [1] 仍要啟用 [0] %_exitmsg% : "
 if errorlevel 2 exit /b
 )
 cls
@@ -472,10 +472,10 @@ reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v EditionID %nul2
 %eline%
 echo [%winos% ^| %winbuild%]
 echo:
-echo Evaluation editions cannot be activated outside of their evaluation period.
-call :dk_color %Blue% "Use TSforge activation option from the main menu to reset evaluation period."
+echo 評估版無法在評估期以外啟用。
+call :dk_color %Blue% "請從主選單使用 TSforge 啟用選項來重設評估期。"
 set fixes=%fixes% %mas%evaluation_editions
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%evaluation_editions"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%evaluation_editions"
 goto dk_done
 )
 )
@@ -501,16 +501,16 @@ if !errorlevel!==0 (set _int=1&set ping_f= But Ping Failed)
 )
 
 if defined _int (
-echo Checking Internet Connection            [Connected%ping_f%]
+echo 正在檢查網際網路連線            [已連線%ping_f%]
 ) else (
 set error=1
-call :dk_color %Red% "Checking Internet Connection            [Not Connected]"
-call :dk_color %Blue% "Internet is required for HWID activation."
+call :dk_color %Red% "正在檢查網際網路連線            [未連線]"
+call :dk_color %Blue% "HWID 啟用需要網際網路。"
 )
 
 ::========================================================================================================================================
 
-echo Initiating Diagnostic Tests...
+echo 正在開始診斷測試...
 
 set "_serv=ClipSVC wlidsvc sppsvc KeyIso LicenseManager Winmgmt"
 
@@ -537,7 +537,7 @@ set notworking=
 call :dk_actids 55c92734-d682-4d71-983e-d6ec3f16059f
 if defined allapps call :hwiddata key
 if not defined key (
-for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':getactivationid\:.*';. ([scriptblock]::Create($f[1]))"') do (set altapplist=%%a)
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':getactivationid\:.*';. ([scriptblock]::Create($f[1]))"') do (set altapplist=%%a)
 if defined altapplist call :hwiddata key
 )
 
@@ -547,22 +547,22 @@ if not defined key call :hwidfallback
 if defined altkey (set key=%altkey%&set changekey=1&set notworking=)
 
 if defined notworking if defined notfoundaltactID (
-call :dk_color %Red% "Checking Alternate Edition For HWID     [%altedition% Activation ID Not Found]"
+call :dk_color %Red% "正在檢查 HWID 的替代版本     [找不到 %altedition% 的啟用識別碼]"
 )
 
 if not defined key (
 %eline%
 echo [%winos% ^| %winbuild% ^| SKU:%osSKU%]
 if not defined skunotfound (
-echo This product does not support HWID activation.
-echo Make sure you are using the latest version of the script.
-echo If you are, then try TSforge activation option from the main menu.
+echo 此產品不支援 HWID 啟用。
+echo 請確認您使用的是最新版腳本。
+echo 若已是最新版，請從主選單改試 TSforge 啟用選項。
 set fixes=%fixes% %mas%
 echo %mas%
 ) else (
-echo Required license files not found in %SysPath%\spp\tokens\skus\
+echo 在 %SysPath%\spp\tokens\skus\ 中找不到所需的授權檔案
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 )
 echo:
 goto dk_done
@@ -576,12 +576,12 @@ if defined notworking set error=1
 
 echo:
 if defined changekey (
-call :dk_color %Blue% "[%altedition%] edition product key will be used to enable HWID activation."
+call :dk_color %Blue% "將使用 [%altedition%] 版本的產品金鑰來進行 HWID 啟用。"
 echo:
 )
 
 if defined winsub (
-call :dk_color %Blue% "Windows Subscription [SKU ID-%slcSKU%] detected. Script will activate base edition [SKU ID-%regSKU%]."
+call :dk_color %Blue% "偵測到 Windows 訂閱 [SKU ID-%slcSKU%]。腳本將啟用基礎版本 [SKU ID-%regSKU%]。"
 echo:
 )
 
@@ -603,9 +603,9 @@ for %%# in (US CN IN BR DE JP GB FR MX ID IT PK TR KR CA ES AU NG VN PL PH NL EG
 if defined regionchange (
 %psc% "Set-WinHomeLocation -GeoId 244" %nul%
 if !errorlevel! EQU 0 (
-echo Changing Windows Region To USA          [Successful] [Script will change it back]
+echo 正在將 Windows 區域變更為美國          [成功] [腳本稍後會改回]
 ) else (
-call :dk_color %Red% "Changing Windows Region To USA          [Failed]"
+call :dk_color %Red% "正在將 Windows 區域變更為美國          [失敗]"
 )
 )
 
@@ -627,12 +627,12 @@ call :hwiddata ticket
 copy /y /b "%tdir%\GenuineTicket" "%tdir%\GenuineTicket.xml" %nul%
 
 if not exist "%tdir%\GenuineTicket.xml" (
-call :dk_color %Red% "Generating GenuineTicket.xml            [Failed, aborting...]"
+call :dk_color %Red% "正在產生 GenuineTicket.xml            [失敗，正在中止...]"
 echo [%encoded%]
 if exist "%tdir%\Genuine*" del /f /q "%tdir%\Genuine*" %nul%
 goto :dl_final
 ) else (
-echo Generating GenuineTicket.xml            [Successful]
+echo 正在產生 GenuineTicket.xml            [成功]
 )
 
 set "_xmlexist=if exist "%tdir%\GenuineTicket.xml""
@@ -645,7 +645,7 @@ set "_xmlexist=if exist "%tdir%\GenuineTicket.xml""
 %_xmlexist% (
 set error=1
 if exist "%tdir%\*.xml" del /f /q "%tdir%\*.xml" %nul%
-call :dk_color %Gray% "Installing GenuineTicket.xml            [Failed with ClipSVC service restart, wait...]"
+call :dk_color %Gray% "正在安裝 GenuineTicket.xml            [失敗，正在重新啟動 ClipSVC 服務，請稍候...]"
 )
 )
 
@@ -657,19 +657,19 @@ set rebuildinfo=
 if not exist %ProgramData%\Microsoft\Windows\ClipSVC\tokens.dat (
 set error=1
 set rebuildinfo=1
-call :dk_color %Red% "Checking ClipSVC tokens.dat             [Not Found]"
+call :dk_color %Red% "正在檢查 ClipSVC tokens.dat             [找不到]"
 )
 
 %_xmlexist% (
 set error=1
 set rebuildinfo=1
-call :dk_color %Red% "Installing GenuineTicket.xml            [Failed With clipup -v -o]"
+call :dk_color %Red% "正在安裝 GenuineTicket.xml            [失敗，已嘗試 clipup -v -o]"
 )
 
 if exist "%ProgramData%\Microsoft\Windows\ClipSVC\Install\Migration\*.xml" (
 set error=1
 set rebuildinfo=1
-call :dk_color %Red% "Checking Ticket Migration               [Failed]"
+call :dk_color %Red% "正在檢查票證移轉               [失敗]"
 )
 
 if not defined altapplist if not defined showfix if defined rebuildinfo (
@@ -685,13 +685,13 @@ if exist "%tdir%\Genuine*" del /f /q "%tdir%\Genuine*" %nul%
 call :dk_product
 
 echo:
-echo Activating...
+echo 正在啟用...
 
 call :dk_act
 call :dk_checkperm
 if defined _perm (
 echo:
-call :dk_color %Green% "%winos% is permanently activated with a digital license."
+call :dk_color %Green% "%winos% 已透過數位授權永久啟用。"
 goto :dl_final
 )
 
@@ -711,7 +711,7 @@ call :dk_checkperm
 reg query "%_ident%" %nul% || (
 set error=1
 echo:
-call :dk_color %Red% "Generating New IdentityCRL Registry     [Failed] [%_ident%]"
+call :dk_color %Red% "正在產生新的 IdentityCRL 登錄檔     [失敗] [%_ident%]"
 )
 )
 
@@ -744,9 +744,9 @@ licensing.mp.microsoft.com
 ) do (
 findstr /i "%%#" "%SysPath%\drivers\etc\hosts" %nul1% && set "hosfail= [%%# Blocked in Hosts]"
 )
-call :dk_color %Red% "Checking Licensing Servers              [Failed to Connect]!hosfail!"
+call :dk_color %Red% "正在檢查授權伺服器              [連線失敗]!hosfail!"
 set fixes=%fixes% %mas%licensing-servers-issue
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%licensing-servers-issue"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%licensing-servers-issue"
 echo:
 )
 
@@ -759,15 +759,15 @@ if %keyerror% EQU 0 if not defined _perm if defined _int (
 reg query "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v DisableWindowsUpdateAccess %nul2% | find /i "0x1" %nul% && set wublock=1
 reg query "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v DoNotConnectToWindowsUpdateInternetLocations %nul2% | find /i "0x1" %nul% && set wublock=1
 if defined wublock (
-call :dk_color %Red% "Checking Update Blocker In Registry     [Found]"
-call :dk_color %Blue% "HWID activation needs working Windows updates, if you have used any tool to block updates, undo it."
+call :dk_color %Red% "正在檢查登錄檔中的更新封鎖項目     [找到]"
+call :dk_color %Blue% "HWID 啟用需要正常運作的 Windows 更新；如果您曾使用任何工具封鎖更新，請復原。"
 echo:
 )
 
 reg query "HKLM\SOFTWARE\Policies\Microsoft\WindowsStore" /v DisableStoreApps %nul2% | find /i "0x1" %nul% && (
 set storeblock=1
-call :dk_color %Red% "Checking Store Blocker In Registry      [Found]"
-call :dk_color %Blue% "If you have used any tool to block Store, undo it."
+call :dk_color %Red% "正在檢查登錄檔中的 Microsoft Store 封鎖項目     [找到]"
+call :dk_color %Blue% "如果您曾使用任何工具封鎖 Microsoft Store，請復原。"
 echo:
 )
 
@@ -782,14 +782,14 @@ reg query HKLM\SYSTEM\CurrentControlSet\Services\wuauserv\%%G %nul% || (set wuco
 
 if defined wucorrupt (
 set error=1
-call :dk_color %Red% "Checking Windows Update Registry        [Corruption Found]"
+call :dk_color %Red% "正在檢查 Windows Update 登錄檔        [發現損毀]"
 if !wcount! GTR 2 (
-call :dk_color %Red% "Windows seems to be infected with Mal%w%ware."
+call :dk_color %Red% "Windows 似乎感染了惡意軟體。"
 set fixes=%fixes% %mas%remove_mal%w%ware
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%remove_mal%w%ware"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%remove_mal%w%ware"
 echo:
 ) else (
-call :dk_color %Blue% "HWID activation needs working Windows updates, if you have used any tool to block updates, undo it."
+call :dk_color %Blue% "HWID 啟用需要正常運作的 Windows 更新；如果您曾使用任何工具封鎖更新，請復原。"
 echo:
 )
 ) else (
@@ -798,8 +798,8 @@ sc query wuauserv | find /i "RUNNING" %nul% || (
 set error=1
 set wuerror=1
 sc start wuauserv %nul%
-call :dk_color %Red% "Starting Windows Update Service         [Failed] [!errorlevel!]"
-call :dk_color %Blue% "HWID activation needs working Windows updates, if you have used any tool to block updates, undo it."
+call :dk_color %Red% "正在啟動 Windows Update 服務         [失敗] [!errorlevel!]"
+call :dk_color %Blue% "HWID 啟用需要正常運作的 Windows 更新；如果您曾使用任何工具封鎖更新，請復原。"
 echo:
 )
 )
@@ -812,9 +812,9 @@ echo:
 if %keyerror% EQU 0 if not defined _perm if defined _int (
 if not defined wucorrupt if not defined wublock if not defined wuerror if not defined storeblock if not defined resfail (
 echo "%error_code%" | findstr /i "0x80072e 0x80072f 0x800704cf 0x87e10bcf 0x800705b4" %nul% && (
-call :dk_color %Red% "Checking Internet Issues                [Found] %error_code%"
+call :dk_color %Red% "正在檢查網際網路問題                [找到] %error_code%"
 set fixes=%fixes% %mas%licensing-servers-issue
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%licensing-servers-issue"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%licensing-servers-issue"
 echo:
 )
 )
@@ -824,16 +824,16 @@ echo:
 
 echo:
 if defined _perm (
-call :dk_color %Green% "%winos% is permanently activated with a digital license."
+call :dk_color %Green% "%winos% 已透過數位授權永久啟用。"
 ) else (
-call :dk_color %Red% "Activation Failed %error_code%"
+call :dk_color %Red% "啟用失敗 %error_code%"
 if defined notworking (
-call :dk_color %Blue% "At the time of writing, HWID Activation is not supported for this product."
-call :dk_color %Blue% "Use TSforge activation option from the main menu instead."
+call :dk_color %Blue% "截至撰寫當下，此產品尚不支援 HWID 啟用。"
+call :dk_color %Blue% "請改從主選單使用 TSforge 啟用選項。"
 ) else (
 if not defined error call :dk_color %Blue% "%_fixmsg%"
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 )
 )
 
@@ -846,9 +846,9 @@ echo:
 if defined regionchange (
 %psc% "Set-WinHomeLocation -GeoId %nation%" %nul%
 if !errorlevel! EQU 0 (
-echo Restoring Windows Region                [Successful]
+echo 正在還原 Windows 區域                [成功]
 ) else (
-call :dk_color %Red% "Restoring Windows Region                [Failed] [%name% - %nation%]"
+call :dk_color %Red% "正在還原 Windows 區域                [失敗] [%name% - %nation%]"
 )
 )
 
@@ -909,11 +909,11 @@ set "_Yellow="Black" "Yellow""
 set "nceline=echo: &echo ==== ERROR ==== &echo:"
 set "eline=echo: &call :dk_color %Red% "==== ERROR ====" &echo:"
 if %~z0 GEQ 200000 (
-set "_exitmsg=Go back"
-set "_fixmsg=Go back to Main Menu, select Troubleshoot and run Fix Licensing option."
+set "_exitmsg=返回"
+set "_fixmsg=請回到主選單，選擇疑難排解，然後執行修復授權選項。"
 ) else (
-set "_exitmsg=Exit"
-set "_fixmsg=In MAS folder, run Troubleshoot script and select Fix Licensing option."
+set "_exitmsg=離開"
+set "_fixmsg=請在 MAS 資料夾執行疑難排解腳本，並選擇修復授權選項。"
 )
 exit /b
 
@@ -932,7 +932,7 @@ if defined UBR (set "fullbuild=%%G.!UBR!") else (set "fullbuild=%%G.%%H")
 )
 )
 
-echo Checking OS Info                        [%winos% ^| %fullbuild% ^| %osarch%]
+echo 正在檢查作業系統資訊                        [%winos% ^| %fullbuild% ^| %osarch%]
 exit /b
 
 ::  Check SKU value
@@ -959,7 +959,7 @@ for /f "tokens=3 delims=." %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Con
 if %_wmic% EQU 1 for /f "tokens=2 delims==" %%a in ('"wmic Path Win32_OperatingSystem Get OperatingSystemSKU /format:LIST" %nul6%') do if not errorlevel 1 set "wmiSKU=%%a"
 if %_wmic% EQU 0 for /f "tokens=1" %%a in ('%psc% "([WMI]'Win32_OperatingSystem=@').OperatingSystemSKU" %nul6%') do if not errorlevel 1 set "wmiSKU=%%a"
 
-if %winbuild% GEQ 15063 %psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':winsubstatus\:.*';. ([scriptblock]::Create($f[1]))" %nul2% | find /i "Subscription_is_activated" %nul% && (
+if %winbuild% GEQ 15063 %psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':winsubstatus\:.*';. ([scriptblock]::Create($f[1]))" %nul2% | find /i "Subscription_is_activated" %nul% && (
 if defined regSKU if defined slcSKU if not "%regSKU%"=="%slcSKU%" (
 set winsub=1
 set osSKU=%regSKU%
@@ -1016,12 +1016,12 @@ set keyerror=%errorlevel%
 cmd /c exit /b %keyerror%
 if %keyerror% NEQ 0 set "keyerror=[0x%=ExitCode%]"
 
-if defined generickey (set "keyecho=Installing Generic Product Key         ") else (set "keyecho=Installing Product Key                 ")
+if defined generickey (set "keyecho=正在安裝通用產品金鑰         ") else (set "keyecho=正在安裝產品金鑰                 ")
 if %keyerror% EQU 0 (
 if %sps%==SoftwareLicensingService call :dk_refresh
-echo %keyecho% %~1 [Successful]
+echo %keyecho% %~1 [成功]
 ) else (
-call :dk_color %Red% "%keyecho% %~1 [Failed] %keyerror%"
+call :dk_color %Red% "%keyecho% %~1 [失敗] %keyerror%"
 if not defined showfix (
 if defined altapplist call :dk_color %Red% "Activation ID not found for this key."
 call :dk_color %Blue% "%_fixmsg%"
@@ -1147,10 +1147,10 @@ set spperror=%errorlevel%
 
 if %spperror% NEQ 1056 if %spperror% NEQ 0 (
 %eline%
-echo sc start %_slser% [Error Code: %spperror%]
+echo sc start %_slser% [錯誤碼: %spperror%]
 if %spperror% EQU 1053 (
-call :dk_color %Blue% "Reboot your machine using the restart option and try again."
-call :dk_color %Blue% "If it still does not work, go back to Main Menu, select Troubleshoot and run Fix WPA Registry option."
+call :dk_color %Blue% "請使用「重新啟動」選項重新開機，然後再試一次。"
+call :dk_color %Blue% "如果仍然無效，請回到主選單，選擇疑難排解，然後執行修復 WPA 登錄檔選項。"
 )
 )
 
@@ -1229,9 +1229,9 @@ if not exist %SysPath%\%_slexe% if not exist %SysPath%\alg.exe (set "results=%re
 if not "%results%%pupfound%"=="" (
 if defined pupfound call :dk_color %Gray% "Checking PUP Activators                 %pupfound%"
 if defined results call :dk_color %Red% "Checking for Mal%w%ware Infection...       %results%"
-call :dk_color %Gray% "It is highly likely that your Windows install is infected with mal%w%ware. Windows may fail to activate."
+call :dk_color %Gray% "您的 Windows 安裝很可能感染了惡意軟體。Windows 可能會啟用失敗。"
 set fixes=%fixes% %mas%remove_mal%w%ware
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%remove_mal%w%ware"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%remove_mal%w%ware"
 echo:
 )
 
@@ -1256,9 +1256,9 @@ call :dk_chkmal
 ::  Check Sandboxing
 
 sc query Null %nul% || (
-call :dk_color %Red% "Checking Sandboxing                     [Found, script may not work properly]"
+call :dk_color %Red% "正在檢查沙盒環境                     [找到，腳本可能無法正常運作]"
 if not defined showfix (
-call :dk_color %Blue% "If you are using any third-party antivirus, check if it is blocking the script."
+call :dk_color %Blue% "如果您使用第三方防毒軟體，請檢查它是否封鎖了此腳本。"
 echo:
 )
 set error=1
@@ -1271,9 +1271,9 @@ set showfix=1
 
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WinPE" /v InstRoot %nul% && (
 
-call :dk_color %Red% "Checking WinPE                          [Found]"
+call :dk_color %Red% "正在檢查 WinPE                          [找到]"
 if not defined showfix (
-call :dk_color %Blue% "WinPE mode found. Reboot the system and run in normal mode."
+call :dk_color %Blue% "偵測到 WinPE 模式。請重新開機，並在一般模式執行。"
 echo:
 )
 set error=1
@@ -1285,9 +1285,9 @@ set showfix=1
 ::  Check Safe mode
 
 if defined safeboot_option (
-call :dk_color %Red% "Checking Boot Mode                      [%safeboot_option%]"
+call :dk_color %Red% "正在檢查開機模式                      [%safeboot_option%]"
 if not defined showfix (
-call :dk_color %Blue% "Safe mode found. Reboot the system and run in normal mode."
+call :dk_color %Blue% "偵測到安全模式。請重新開機，並在一般模式執行。"
 echo:
 )
 set error=1
@@ -1302,10 +1302,10 @@ set showfix=1
 for /f "skip=2 tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\State" /v ImageState') do (set imagestate=%%B)
 
 if /i not "%imagestate%"=="IMAGE_STATE_COMPLETE" (
-call :dk_color %Gray% "Checking Windows Setup State            [%imagestate%]"
+call :dk_color %Gray% "正在檢查 Windows 安裝程式狀態            [%imagestate%]"
 echo "%imagestate%" | find /i "RESEAL" %nul% && (
 if not defined showfix (
-call :dk_color %Blue% "You need to run it in normal mode in case you are running it in Audit Mode."
+call :dk_color %Blue% "如果您目前是在稽核模式下執行，請改在一般模式下執行。"
 echo:
 )
 set error=1
@@ -1314,7 +1314,7 @@ set showfix=1
 echo "%imagestate%" | find /i "UNDEPLOYABLE" %nul% && (
 if not defined showfix (
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "If the activation fails, do this - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "如果啟用失敗，請這樣做 - " %_Yellow% " %mas%in-place_repair_upgrade"
 echo:
 )
 )
@@ -1339,16 +1339,16 @@ if defined _corrupt (if defined serv_cor (set "serv_cor=!serv_cor! %%#!_regcorr!
 )
 
 if defined serv_cor (
-call :dk_color %Red% "Checking Corrupt Services               [%serv_cor%]"
+call :dk_color %Red% "正在檢查損毀的服務               [%serv_cor%]"
 
 if not defined showfix (
 echo:
 if /i "%serv_cor%"=="sppsvc-RegistryError" (
 set fixes=%fixes% %mas%fix_service
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%fix_service"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%fix_service"
 ) else (
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 )
 echo:
 )
@@ -1392,16 +1392,16 @@ if defined serv_cste (set "serv_cste=!serv_cste! %%#") else (set "serv_cste=%%#"
 if defined serv_csts call :dk_color %Gray% "Enabling Disabled Services              [Successful] [%serv_csts%]"
 
 if defined serv_cste (
-call :dk_color %Red% "Enabling Disabled Services              [Failed] [%serv_cste%]"
+call :dk_color %Red% "正在啟用已停用的服務              [失敗] [%serv_cste%]"
 
 if not defined showfix (
 echo:
 echo %serv_cste% | findstr /i "ClipSVC sppsvc" %nul% && (
-echo A registry fix has been applied to enable the disabled service.
-call :dk_color %Blue% "Reboot your machine using the restart option to fix this error."
+echo 已套用登錄檔修正來啟用被停用的服務。
+call :dk_color %Blue% "請使用「重新啟動」選項重新開機，以修復此錯誤。"
 ) || (
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 )
 echo:
 )
@@ -1432,15 +1432,15 @@ if defined checkerror if defined serv_e (set "serv_e=!serv_e!, %%#-!errorcode!")
 )
 
 if defined serv_e (
-call :dk_color %Red% "Starting Services                       [Failed] [%serv_e%]"
+call :dk_color %Red% "正在啟動服務                       [失敗] [%serv_e%]"
 
 if not defined showfix (
 set listwospp=%_serv:sppsvc=%
 echo %serv_e% | findstr /i "!listwospp!" %nul% && (
 set showfix=1
-call :dk_color %Blue% "Reboot your machine using the restart option and run the script again."
+call :dk_color %Blue% "請使用「重新啟動」選項重新開機，然後再次執行腳本。"
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "If service error is still not fixed, do this - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "如果服務錯誤仍未修復，請這樣做 - " %_Yellow% " %mas%in-place_repair_upgrade"
 echo:
 )
 )
@@ -1466,10 +1466,10 @@ if %error_code% NEQ 0 set "error_code=0x%=ExitCode%"
 echo "%error_code%" | findstr /i "0x800410 0x800440 0x80131501" %nul1% && set wmifailed=1& ::  https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-error-constants
 
 if defined wmifailed (
-call :dk_color %Red% "Checking WMI                            [Not Working]"
+call :dk_color %Red% "正在檢查 WMI                            [無法運作]"
 
 if not defined showfix (
-call :dk_color %Blue% "Go back to Main Menu, select Troubleshoot and run Fix WMI option."
+call :dk_color %Blue% "請回到主選單，選擇疑難排解，然後執行修復 WMI 選項。"
 echo:
 )
 set error=1
@@ -1481,10 +1481,10 @@ set showfix=1
 ::  Check SPP Registry Key
 
 if %winbuild% GEQ 7600 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform\Plugins\Objects\msft:rm/algorithm/hwid/4.0" /f ba02fed39662 /d %nul% || (
-call :dk_color %Red% "Checking SPP Registry Key               [Incorrect ModuleId Found] [Most likely caused by gaming spoofers]"
+call :dk_color %Red% "正在檢查 SPP 登錄檔機碼               [發現不正確的 ModuleId] [很可能是由遊戲詐騙工具造成]"
 if not defined showfix (
 set fixes=%fixes% %mas%issues_due_to_gaming_spoofers
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%issues_due_to_gaming_spoofers"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%issues_due_to_gaming_spoofers"
 echo:
 )
 set error=1
@@ -1501,10 +1501,10 @@ for /f "skip=2 tokens=2*" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT
 if %winbuild% LSS 9200 set "tokenstore=%Systemdrive%\Windows\ServiceProfiles\NetworkService\AppData\Roaming\Microsoft\SoftwareProtectionPlatform"
 
 if %winbuild% GEQ 9200 if /i not "!tokenstore!"=="%SysPath%\spp\store" if /i not "!tokenstore!"=="%SysPath%\spp\store\2.0" if /i not "!tokenstore!"=="%SysPath%\spp\store_test\2.0" (
-call :dk_color %Red% "Checking TokenStore Registry Key        [Correct Path Not Found] [!tokenstore!]"
+call :dk_color %Red% "正在檢查 TokenStore 登錄檔機碼        [找不到正確路徑] [!tokenstore!]"
 if not defined showfix (
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 echo:
 )
 set toerr=1
@@ -1529,12 +1529,12 @@ set "d=!d! Set-Acl -Path %tokenstore% -AclObject $AclObject;"
 %psc% "!d!" %nul%
 
 if exist "%tokenstore%\" (
-call :dk_color %Gray% "Checking SPP Token Folder               [Not Found, Created Now] [%tokenstore%\]"
+call :dk_color %Gray% "正在檢查 SPP token 資料夾               [找不到，已建立] [%tokenstore%\]"
 ) else (
-call :dk_color %Red% "Checking SPP Token Folder               [Not Found, Failed to Create] [%tokenstore%\]"
+call :dk_color %Red% "正在檢查 SPP token 資料夾               [找不到，建立失敗] [%tokenstore%\]"
 if not defined showfix (
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 echo:
 )
 set error=1
@@ -1575,7 +1575,7 @@ if !errorlevel!==3 set "permerror=Error Found In S-1-5-20 SPP"
 )
 
 if defined permerror (
-call :dk_color %Red% "Checking SPP Permissions                [!permerror!]"
+call :dk_color %Red% "正在檢查 SPP 權限                [!permerror!]"
 if not defined showfix (
 call :dk_color %Blue% "%_fixmsg%"
 echo:
@@ -1591,14 +1591,14 @@ set showfix=1
 
 set chkalp=
 set wpainfo=NotFound
-for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':wpatest\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (set wpainfo=%%a)
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':wpatest\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (set wpainfo=%%a)
 for /f "delims=0123456789" %%i in ("%wpainfo%") do set chkalp=%%i
 
 if defined chkalp (
-call :dk_color %Red% "Checking WPA Registry Errors            [%wpainfo%]"
+call :dk_color %Red% "正在檢查 WPA 登錄檔錯誤            [%wpainfo%]"
 if not defined showfix (
 echo "%wpainfo%" | find /i "Error Found" %nul% && (
-call :dk_color %Blue% "Go back to Main Menu, select Troubleshoot and run Fix WPA Registry option."
+call :dk_color %Blue% "請回到主選單，選擇疑難排解，然後執行修復 WPA 登錄檔選項。"
 echo:
 set error=1
 set showfix=1
@@ -1609,12 +1609,12 @@ set wpainfo=a
 
 if not defined chkalp (
 if %wpainfo% GEQ 5000 (
-call :dk_color %Gray% "Checking WPA Registry Count             [%wpainfo%]"
-call :dk_color %Blue% "A large number of WPA registries have been found, which may cause high CPU usage."
-call :dk_color %Blue% "Go back to Main Menu, select Troubleshoot and run Fix WPA Registry option."
+call :dk_color %Gray% "正在檢查 WPA 登錄檔數量             [%wpainfo%]"
+call :dk_color %Blue% "發現大量 WPA 登錄檔，可能造成 CPU 使用率偏高。"
+call :dk_color %Blue% "請回到主選單，選擇疑難排解，然後執行修復 WPA 登錄檔選項。"
 echo:
 ) else (
-echo Checking WPA Registry Count             [%wpainfo%]
+echo 正在檢查 WPA 登錄檔數量             [%wpainfo%]
 )
 )
 
@@ -1623,9 +1623,9 @@ echo Checking WPA Registry Count             [%wpainfo%]
 ::  Check Rearm
 
 reg query "HKU\S-1-5-20\Software\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform\PersistedTSReArmed" %nul% && (
-call :dk_color %Red% "Checking Rearm                          [System is Rearmed]"
+call :dk_color %Red% "正在檢查 Rearm                          [系統已 Rearm]"
 if not defined showfix (
-call :dk_color %Blue% "Reboot your machine using the restart option to fix this error."
+call :dk_color %Blue% "請使用「重新啟動」選項重新開機，以修復此錯誤。"
 echo:
 )
 set error=1
@@ -1634,9 +1634,9 @@ set showfix=1
 
 
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ClipSVC\Volatile\PersistedSystemState" %nul% && (
-call :dk_color %Red% "Checking ClipSVC PersistedSystemState   [Found]"
+call :dk_color %Red% "正在檢查 ClipSVC PersistedSystemState   [找到]"
 if not defined showfix (
-call :dk_color %Blue% "Reboot your machine using the restart option to fix this error."
+call :dk_color %Blue% "請使用「重新啟動」選項重新開機，以修復此錯誤。"
 echo:
 )
 set error=1
@@ -1648,10 +1648,10 @@ set showfix=1
 ::  Check SoftwareLicensingService
 
 if %error_code% NEQ 0 (
-call :dk_color %Red% "Checking SoftwareLicensingService       [Not Working] [%error_code%]"
+call :dk_color %Red% "正在檢查 SoftwareLicensingService       [無法運作] [%error_code%]"
 if not defined showfix (
 call :dk_color %Blue% "%_fixmsg%"
-call :dk_color %Blue% "If activation still fails then run Fix WPA Registry option."
+call :dk_color %Blue% "如果啟用仍然失敗，請執行修復 WPA 登錄檔選項。"
 echo:
 )
 set error=1
@@ -1665,7 +1665,7 @@ set showfix=1
 call :dk_actid 55c92734-d682-4d71-983e-d6ec3f16059f
 
 if not defined apps (
-%psc% "if (-not $env:_vis) {Start-Job { Stop-Service %_slser% -force } | Wait-Job -Timeout 20 | Out-Null}; $sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
+%psc% "if (-not $env:_vis) {Start-Job { Stop-Service %_slser% -force } | Wait-Job -Timeout 20 | Out-Null}; $sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
 if not defined _vis if !errorlevel! NEQ 0 set rlicfailed=1
 call :dk_actid 55c92734-d682-4d71-983e-d6ec3f16059f
 )
@@ -1673,14 +1673,14 @@ call :dk_actid 55c92734-d682-4d71-983e-d6ec3f16059f
 if not defined apps call :dk_actids 55c92734-d682-4d71-983e-d6ec3f16059f
 
 if not defined apps if defined allapps if not defined notwinact (
-call :dk_color %Gray% "Checking Activation IDs                 [Key Not Installed or Act ID Not Found]"
+call :dk_color %Gray% "正在檢查啟用識別碼                 [金鑰未安裝或找不到啟用識別碼]"
 )
 
 if not defined apps if not defined allapps (
-call :dk_color %Red% "Checking Activation IDs                 [Not found]"
+call :dk_color %Red% "正在檢查啟用識別碼                 [找不到]"
 if not defined showfix (
 call :dk_color %Blue% "%_fixmsg%"
-call :dk_color %Blue% "If activation still fails then run Fix WPA Registry option."
+call :dk_color %Blue% "如果啟用仍然失敗，請執行修復 WPA 登錄檔選項。"
 echo:
 )
 set error=1
@@ -1689,12 +1689,12 @@ set showfix=1
 
 if not defined showfix if defined rlicfailed (
 call :dk_color %Blue% "%_fixmsg%"
-call :dk_color %Blue% "If activation still fails then run Fix WPA Registry option."
+call :dk_color %Blue% "如果啟用仍然失敗，請執行修復 WPA 登錄檔選項。"
 echo:
 )
 
 if %winbuild% GEQ 7600 if exist "%tokenstore%\" if not exist "%tokenstore%\tokens.dat" (
-call :dk_color %Red% "Checking SPP tokens.dat                 [Not Found] [%tokenstore%\]"
+call :dk_color %Red% "正在檢查 SPP tokens.dat                 [找不到] [%tokenstore%\]"
 )
 
 ::==============================
@@ -1703,11 +1703,11 @@ call :dk_color %Red% "Checking SPP tokens.dat                 [Not Found] [%toke
 
 if not defined notwinact if exist "%SystemRoot%\Servicing\Packages\Microsoft-Windows-*EvalEdition~*.mum" (
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v EditionID %nul2% | find /i "Eval" %nul1% || (
-call :dk_color %Red% "Checking Eval Packages                  [License swapping found. Non-Eval licenses are installed in Eval Windows]"
+call :dk_color %Red% "正在檢查評估版套件                  [發現授權調換。評估版 Windows 上安裝了非評估版授權]"
 if not defined showfix (
-call :dk_color %Blue% "License swapping is not the right way to upgrade to the full version. Learn the correct method at the link below."
+call :dk_color %Blue% "授權調換不是升級到完整版的正確方式。請從下方連結了解正確做法。"
 set fixes=%fixes% %mas%evaluation_editions
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%evaluation_editions"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%evaluation_editions"
 echo:
 )
 set error=1
@@ -1720,10 +1720,10 @@ set showfix=1
 ::  Check HKU\S-1-5-20\Software registry, in some systems it's missing and that causes Windows activation problems
 
 reg query "HKU\S-1-5-20\Software\Microsoft\Windows NT\CurrentVersion" %nul% || (
-call :dk_color %Red% "Checking HKU\S-1-5-20 Registry          [Not Found]"
+call :dk_color %Red% "正在檢查 HKU\S-1-5-20 登錄檔          [找不到]"
 if not defined showfix (
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 echo:
 )
 set error=1
@@ -1750,18 +1750,18 @@ if "%osSKU%"=="165" set osedition=ProfessionalEducationN
 
 if not defined notwinact (
 if %osedition%==0 (
-call :dk_color %Red% "Checking Edition Name                   [Not Found In Registry]"
+call :dk_color %Red% "正在檢查版本名稱                   [登錄檔中找不到]"
 ) else (
 if not exist "%SysPath%\spp\tokens\skus\%osedition%\%osedition%*.xrm-ms" if not exist "%SysPath%\spp\tokens\skus\Security-SPP-Component-SKU-%osedition%\*-%osedition%-*.xrm-ms" if not exist "%SysPath%\licensing\skus\Security-Licensing-SLC-Component-SKU-%osedition%\*-%osedition%-*.xrm-ms" (
 set skunotfound=1
-call :dk_color %Red% "Checking License Files                  [Not Found] [%osedition%]"
+call :dk_color %Red% "正在檢查授權檔案                  [找不到] [%osedition%]"
 )
 if not exist "%SystemRoot%\Servicing\Packages\Microsoft-Windows-*-%osedition%-*.mum" (
 if not exist "%SystemRoot%\Servicing\Packages\Microsoft-Windows-%osedition%Edition*.mum" (
-call :dk_color %Red% "Checking Package Files                  [Not Found] [%osedition%]"
+call :dk_color %Red% "正在檢查套件檔案                  [找不到] [%osedition%]"
 if not defined showfix (
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 echo:
 )
 set error=1
@@ -1780,13 +1780,13 @@ if %winbuild% GEQ 10240 (
 %nul% set /a "sum=%slcSKU%+%regSKU%+%wmiSKU%"
 set /a "sum/=3"
 if not "!sum!"=="%slcSKU%" (
-call :dk_color %Gray% "Checking SLC/WMI/REG SKU                [Difference Found - SLC:%slcSKU% WMI:%wmiSKU% Reg:%regSKU%]"
+call :dk_color %Gray% "正在檢查 SLC/WMI/REG SKU                [發現不一致 - SLC:%slcSKU% WMI:%wmiSKU% Reg:%regSKU%]"
 )
 ) else (
 %nul% set /a "sum=%slcSKU%+%wmiSKU%"
 set /a "sum/=2"
 if not "!sum!"=="%slcSKU%" (
-call :dk_color %Gray% "Checking SLC/WMI SKU                    [Difference Found - SLC:%slcSKU% WMI:%wmiSKU%]"
+call :dk_color %Gray% "正在檢查 SLC/WMI SKU                    [發現不一致 - SLC:%slcSKU% WMI:%wmiSKU%]"
 )
 )
 )
@@ -1798,7 +1798,7 @@ call :dk_color %Gray% "Checking SLC/WMI SKU                    [Difference Found
 sc query wlms %nul%
 
 if %errorlevel% NEQ 1060 (
-echo Checking Eval WLMS Service              [Found]
+echo 正在檢查 Eval WLMS 服務              [找到]
 )
 
 ::==============================
@@ -1810,14 +1810,14 @@ reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Ima%w%ge File Execu
 )
 if defined _sppint (
 echo %_sppint% | find /i "PerfOptions" %nul% && (
-call :dk_color %Red% "Checking SPP Interference In IFEO       [%_sppint% - System might deactivate later]"
+call :dk_color %Red% "正在檢查 IFEO 中的 SPP 干擾       [%_sppint% - 系統之後可能會失去啟用]"
 if not defined showfix (
 call :dk_color %Blue% "%_fixmsg%"
 echo:
 )
 set showfix=1
 ) || (
-echo Checking SPP In IFEO                    [%_sppint%]
+echo 正在檢查 IFEO 中的 SPP                    [%_sppint%]
 )
 )
 
@@ -1827,7 +1827,7 @@ echo Checking SPP In IFEO                    [%_sppint%]
 
 if %winbuild% GEQ 7600 for /f "skip=2 tokens=2*" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform" /v "SkipRearm" %nul6%') do if /i %%b NEQ 0x0 (
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform" /v "SkipRearm" /t REG_DWORD /d "0" /f %nul%
-call :dk_color %Gray% "Checking SkipRearm                      [Default 0 Value Not Found. Changing To 0]"
+call :dk_color %Gray% "正在檢查 SkipRearm                      [找不到預設值 0。正在改為 0]"
 %psc% "Start-Job { Stop-Service sppsvc -force } | Wait-Job -Timeout 20 | Out-Null"
 )
 
@@ -1844,13 +1844,13 @@ reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Soft
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tree\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTask" %nul% || set taskinfo=Removed
 if "!taskinfo!"=="" set "taskinfo=Not Found"
 
-call :dk_color %Gray% "Checking SvcRestartTask Status          [!taskinfo!. System might deactivate later.]"
+call :dk_color %Gray% "正在檢查 SvcRestartTask 狀態          [!taskinfo!。系統之後可能會失去啟用。]"
 if not defined showfix (
 echo "!taskinfo!" | findstr /i "Removed Not Found" %nul1% && (
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 ) || (
-call :dk_color %Blue% "Reboot your machine using the restart option and run the script again."
+call :dk_color %Blue% "請使用「重新啟動」選項重新開機，然後再次執行腳本。"
 )
 echo:
 )
@@ -1946,18 +1946,18 @@ echo:
 if %_unattended%==1 timeout /t 2 & exit /b
 
 if defined fixes (
-call :dk_color %White% "Follow ALL the ABOVE blue lines.   "
-call :dk_color2 %Blue% "Press [1] to Open Support Webpage " %Gray% " Press [0] to Go Back"
+call :dk_color %White% "請遵循上方所有藍色文字的指示。   "
+call :dk_color2 %Blue% "按 [1] 開啟支援網頁 " %Gray% " 按 [0] 返回"
 choice /C:10 /N
 if !errorlevel!==2 exit /b
 if !errorlevel!==1 (start %selfgit% & start %github% & for %%# in (%fixes%) do (start %%#))
 )
 
 if defined terminal (
-call :dk_color %_Yellow% "Press [0] key to %_exitmsg%..."
+call :dk_color %_Yellow% "按 [0] 鍵以%_exitmsg%..."
 choice /c 0 /n
 ) else (
-call :dk_color %_Yellow% "Press any key to %_exitmsg%..."
+call :dk_color %_Yellow% "按任意鍵以%_exitmsg%..."
 pause %nul1%
 )
 
@@ -2030,7 +2030,7 @@ REM Generate ticket
 
 if %1==ticket if "%key%"=="%%B" (
 set "SessionIdStr=OSMajorVersion=5;OSMinorVersion=1;OSPlatformId=2;PP=0;Pfn=Microsoft.Windows.%%C.%%D_8wekyb3d8bbwe;PKeyIID=221306452340115677963964261259250411589493550039199940431586886;"
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':sign\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':sign\:.*';. ([scriptblock]::Create($f[1]))"
 )
 
 )

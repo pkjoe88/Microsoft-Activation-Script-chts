@@ -1,13 +1,13 @@
 --------------------------------------------------------------------------------------
-Activation Type        Supported Product        Activation Period
+啟用方式                支援的產品                啟用期限
 --------------------------------------------------------------------------------------
 
-HWID                -  Windows 10-11          -  Permanent                           
-Ohook               -  Office                 -  Permanent                           
-TSforge             -  Windows / ESU / Office -  Permanent                           
-Online KMS          -  Windows / Office       -  180 Days. Lifetime With Renewal Task
+HWID                -  Windows 10-11          -  永久
+Ohook               -  Office                 -  永久
+TSforge             -  Windows / ESU / Office -  永久
+Online KMS          -  Windows / Office       -  180 天。設定更新工作可永久續期
 
 --------------------------------------------------------------------------------------
 
-Check the below link for more details:
+更多詳細資訊請見下方連結：
 https://massgrave.dev/chart

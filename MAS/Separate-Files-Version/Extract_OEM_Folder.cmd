@@ -80,10 +80,10 @@ set "selfgit=ht%blank%tps%blank%://git.acti%blank%vated.win/Micr%blank%osoft-Act
 sc query Null | find /i "RUNNING"
 if %errorlevel% NEQ 0 (
 echo:
-echo Null service is not running, script may crash...
+echo Null 服務未執行，腳本可能會當機...
 echo:
 echo:
-echo Check this webpage for help - %mas%fix_service
+echo 請查看此網頁尋求協助 - %mas%fix_service
 echo:
 echo:
 ping 127.0.0.1 -n 20
@@ -94,10 +94,10 @@ cls
 
 >nul findstr /v "$" "%_cmdf%" && (
 echo:
-echo Error - Script either has LF line ending issue or an empty line at the end of the script is missing.
+echo 錯誤 - 腳本的換行格式有 LF 問題，或腳本結尾缺少一行空行。
 echo:
 echo:
-echo Check this webpage for help - %mas%troubleshoot
+echo 請查看此網頁尋求協助 - %mas%troubleshoot
 echo:
 echo:
 ping 127.0.0.1 -n 20 >nul
@@ -108,7 +108,7 @@ exit /b
 
 cls
 color 07
-title  Extract $OEM$ Folder %masver%
+title  解壓 $OEM$ 資料夾 %masver%
 
 set _args=
 set _elev=
@@ -135,19 +135,19 @@ call :dk_setvar
 
 if %winbuild% EQU 1 (
 %eline%
-echo Failed to detect Windows build number.
+echo 無法偵測 Windows 組建編號。
 echo:
 setlocal EnableDelayedExpansion
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto done2
 )
 
 if exist "%Systemdrive%\Users\WDAGUtilityAccount" (
 sc query gcs | find /i "RUNNING" %nul% && (
 %eline%
-echo Windows Sandbox detected.
-echo The script cannot run due to missing licensing components. Aborting...
+echo 偵測到 Windows Sandbox。
+echo 系統缺少授權元件，腳本無法執行。正在中止...
 echo:
 goto done2
 )
@@ -155,12 +155,12 @@ goto done2
 
 if %winbuild% LSS 6001 (
 %nceline%
-echo Unsupported OS version detected [%winbuild%].
-echo MAS only supports Windows Vista/7/8/8.1/10/11 and their Server equivalents.
+echo 偵測到不支援的作業系統版本 [%winbuild%]。
+echo MAS 僅支援 Windows Vista/7/8/8.1/10/11 與對應的 Server 版本。
 if %winbuild% EQU 6000 (
 echo:
-echo Windows Vista RTM is not supported because Powershell cannot be installed.
-echo Upgrade to Windows Vista SP1 or SP2.
+echo 不支援 Windows Vista RTM，因為無法安裝 PowerShell。
+echo 請升級至 Windows Vista SP1 或 SP2。
 )
 goto done2
 )
@@ -168,9 +168,9 @@ goto done2
 if %winbuild% LSS 7600 if not exist "%SysPath%\WindowsPowerShell\v1.0\Modules" (
 %nceline%
 if not exist %ps% (
-echo PowerShell is not installed in your system.
+echo 系統未安裝 PowerShell。
 )
-echo Install PowerShell 2.0 using the following URL.
+echo 請從下列網址安裝 PowerShell 2.0。
 echo:
 echo https://www.catalog.update.microsoft.com/Search.aspx?q=KB968930
 if %_unattended%==0 start https://www.catalog.update.microsoft.com/Search.aspx?q=KB968930
@@ -198,10 +198,10 @@ setlocal EnableDelayedExpansion
 echo "!_cmdf!" | find /i "!_ttemp!" %nul1% && (
 if /i not "!_work!"=="!_ttemp!" (
 %eline%
-echo The script was launched from the temp folder.
-echo You are most likely running the script directly from the archive file.
+echo 腳本是從暫存資料夾啟動的。
+echo 您很可能是直接在壓縮檔內執行腳本。
 echo:
-echo Extract the archive file and launch the script from the extracted folder.
+echo 請先解壓縮檔案，再從解壓後的資料夾啟動腳本。
 goto dk_done
 )
 )
@@ -213,8 +213,8 @@ goto dk_done
 %nul1% fltmc || (
 if not defined _elev %psc% "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
 %eline%
-echo This script needs admin rights.
-echo Right click on this script and select 'Run as administrator'.
+echo 此腳本需要系統管理員權限。
+echo 請以滑鼠右鍵按一下此腳本，然後選擇「以系統管理員身分執行」。
 goto done2
 )
 
@@ -224,31 +224,31 @@ goto done2
 
 ::pstst $ExecutionContext.SessionState.LanguageMode :pstst
 
-for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!') -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
+for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
 
 if /i not "%tstresult%"=="FullLanguage" (
 %eline%
 for /f "delims=" %%a in ('%psc% "$ExecutionContext.SessionState.LanguageMode" %nul6%') do (set tstresult2=%%a)
-echo Test 1 - %tstresult%
-echo Test 2 - !tstresult2!
+echo 測試 1 - %tstresult%
+echo 測試 2 - !tstresult2!
 echo:
 
 REM check LanguageMode
 
 echo: !tstresult2! | findstr /i "ConstrainedLanguage RestrictedLanguage NoLanguage" %nul1% && (
-echo FullLanguage mode not found in PowerShell. Aborting...
-echo If you have applied restrictions on Powershell then undo those changes.
+echo PowerShell 未處於 FullLanguage 模式。正在中止...
+echo 如果您曾對 PowerShell 套用限制，請先復原那些變更。
 set fixes=%fixes% %mas%fix_powershell
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%fix_powershell"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%fix_powershell"
 goto done2
 )
 
 REM check Powershell core version
 
 cmd /c "%psc% "$PSVersionTable.PSEdition"" | find /i "Core" %nul1% && (
-echo Windows Powershell is needed for MAS but it seems to be replaced with Powershell core. Aborting...
+echo MAS 需要 Windows PowerShell，但系統中的 PowerShell 似乎已被 PowerShell Core 取代。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto done2
 )
 
@@ -256,9 +256,9 @@ REM check for Mal-ware that may cause issues with Powershell
 
 for /r "%ProgramFiles%\" %%f in (secureboot.exe) do if exist "%%f" (
 echo "%%f"
-echo Mal%blank%ware found, PowerShell is not working properly.
+echo 偵測到惡意軟體，PowerShell 無法正常運作。
 set fixes=%fixes% %mas%remove_mal%w%ware
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%remove_mal%w%ware"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%remove_mal%w%ware"
 goto done2
 )
 
@@ -267,29 +267,29 @@ REM check if .NET is working properly
 if /i "!tstresult2!"=="FullLanguage" (
 cmd /c "%psc% ""try {[System.AppDomain]::CurrentDomain.GetAssemblies(); [System.Math]::Sqrt(144)} catch {Exit 3}""" %nul%
 if !errorlevel!==3 (
-echo Windows Powershell failed to load .NET command. Aborting...
+echo Windows PowerShell 無法載入 .NET 命令。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto done2
 )
 )
 
 REM check antivirus and other errors
 
-echo PowerShell is not working properly. Aborting...
+echo PowerShell 無法正常運作。正在中止...
 
 if /i "!tstresult2!"=="FullLanguage" (
 echo:
-echo Your antivirus software might be blocking the script.
+echo 您的防毒軟體可能封鎖了此腳本。
 echo:
 sc query sense | find /i "RUNNING" %nul% && (
-echo Installed Antivirus - Microsoft Defender for Endpoint
+echo 已安裝的防毒軟體 - Microsoft Defender for Endpoint
 )
 cmd /c "%psc% ""$av = Get-WmiObject -Namespace root\SecurityCenter2 -Class AntiVirusProduct; $n = @(); foreach ($i in $av) { $n += $i.displayName }; if ($n) { Write-Host ('Installed Antivirus - ' + ($n -join ', '))}"""
 )
 
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto done2
 )
 
@@ -360,14 +360,14 @@ if not "%%C"=="" set old=
 if defined old (
 echo ________________________________________________
 %eline%
-echo Your version of MAS [%masver%] is outdated.
+echo 您的 MAS 版本 [%masver%] 已過期。
 echo ________________________________________________
 echo:
 if not %_unattended%==1 (
-echo [1] Get Latest MAS
-echo [0] Continue Anyway
+echo [1] 取得最新版 MAS
+echo [0] 仍要繼續
 echo:
-call :dk_color %_Green% "Choose a menu option using your keyboard [1,0] :"
+call :dk_color %_Green% "請以鍵盤選擇選單選項 [1,0]："
 choice /C:10 /N
 if !errorlevel!==2 rem
 if !errorlevel!==1 (start %selfgit% & start %github% & start %mas% & exit /b)
@@ -389,7 +389,7 @@ set "_dir=%desktop%\$OEM$\$$\Setup\Scripts"
 
 if exist "!desktop!\" (
 %eline%
-echo Unable to detect Desktop location, aborting...
+echo 無法偵測桌面位置，正在中止...
 goto done2
 )
 
@@ -402,7 +402,7 @@ if not defined terminal mode 78, 30
 if exist "!desktop!\$OEM$\" (
 echo _____________________________________________________
 %eline%
-echo The $OEM$ folder already exists on your Desktop.
+echo 桌面上已存在 $OEM$ 資料夾。
 echo _____________________________________________________
 goto done2
 )
@@ -428,7 +428,7 @@ popd
 if defined _nofile (
 echo _____________________________________________________
 %eline%
-echo Some files are missing in the 'Activators' folder.
+echo 「Activators」資料夾中缺少某些檔案。
 echo _____________________________________________________
 goto done2
 )
@@ -443,7 +443,7 @@ echo:
 echo:
 echo:
 echo:
-echo:                     Extract $OEM$ folder on the desktop           
+echo:                     在桌面解壓 $OEM$ 資料夾           
 echo:         ____________________________________________________________
 echo:
 echo:            [1] HWID       [Windows]
@@ -456,10 +456,10 @@ echo:            [6] HWID       [Windows] ^+ Ohook [Office] ^+ TSforge [ESU]
 echo:            [7] TSforge    [Windows / ESU] ^+ Ohook [Office]
 echo:
 call :dk_color2 %_White% "            [R] " %_Green% "ReadMe"
-echo:            [0] Exit
+echo:            [0] 離開
 echo:         ____________________________________________________________
 echo:  
-call :dk_color2 %_White% "             " %_Green% "Choose a menu option using your keyboard :"
+call :dk_color2 %_White% "             " %_Green% "請以鍵盤選擇選單選項："
 choice /C:1234567R0 /N
 set _erl=%errorlevel%
 
@@ -719,7 +719,7 @@ cd \
 :errorfound
 
 %eline%
-echo The script failed to create the $OEM$ folder.
+echo 腳本無法建立 $OEM$ 資料夾。
 goto :done2
 
 :done
@@ -727,25 +727,25 @@ goto :done2
 echo ______________________________________________________________
 echo:
 call :dk_color %Blue% "%oem%"
-call :dk_color %Green% "$OEM$ folder was successfully created on your Desktop."
+call :dk_color %Green% "已成功在桌面建立 $OEM$ 資料夾。"
 echo ______________________________________________________________
 
 :done2
 
 echo:
 if defined fixes (
-call :dk_color %White% "Follow ALL the ABOVE blue lines.   "
-call :dk_color2 %Blue% "Press [1] to Open Support Webpage " %Gray% " Press [0] to Go Back"
+call :dk_color %White% "請遵循上方所有藍色文字的指示。   "
+call :dk_color2 %Blue% "按 [1] 開啟支援網頁 " %Gray% " 按 [0] 返回"
 choice /C:10 /N
 if !errorlevel!==2 exit /b
 if !errorlevel!==1 (start %selfgit% & start %github% & for %%# in (%fixes%) do (start %%#))
 )
 
 if defined terminal (
-call :dk_color %_Yellow% "Press [0] key to %_exitmsg%..."
+call :dk_color %_Yellow% "按 [0] 鍵以%_exitmsg%..."
 choice /c 0 /n
 ) else (
-call :dk_color %_Yellow% "Press any key to %_exitmsg%..."
+call :dk_color %_Yellow% "按任意鍵以%_exitmsg%..."
 pause %nul1%
 )
 exit /b
@@ -798,11 +798,11 @@ set "_Yellow="Black" "Yellow""
 set "nceline=echo: &echo ==== ERROR ==== &echo:"
 set "eline=echo: &call :dk_color %Red% "==== ERROR ====" &echo:"
 if %~z0 GEQ 200000 (
-set "_exitmsg=Go back"
-set "_fixmsg=Go back to Main Menu, select Troubleshoot and run Fix Licensing option."
+set "_exitmsg=返回"
+set "_fixmsg=請回到主選單，選擇疑難排解，然後執行修復授權選項。"
 ) else (
-set "_exitmsg=Exit"
-set "_fixmsg=In MAS folder, run Troubleshoot script and select Fix Licensing option."
+set "_exitmsg=離開"
+set "_fixmsg=請在 MAS 資料夾執行疑難排解腳本，並選擇修復授權選項。"
 )
 exit /b
 
@@ -812,7 +812,7 @@ exit /b
 
 :export
 
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split \":%~1\:.*`r`n\"; [io.file]::WriteAllText('!_pdesk!\$OEM$\$$\Setup\Scripts\SetupComplete.cmd',$f[1].Trim(),[System.Text.Encoding]::ASCII);"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split \":%~1\:.*`r`n\"; [io.file]::WriteAllText('!_pdesk!\$OEM$\$$\Setup\Scripts\SetupComplete.cmd',$f[1].Trim(),[System.Text.Encoding]::ASCII);"
 exit /b
 
 ::========================================================================================================================================

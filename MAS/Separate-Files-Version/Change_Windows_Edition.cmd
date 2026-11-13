@@ -85,10 +85,10 @@ set "selfgit=ht%blank%tps%blank%://git.acti%blank%vated.win/Micr%blank%osoft-Act
 sc query Null | find /i "RUNNING"
 if %errorlevel% NEQ 0 (
 echo:
-echo Null service is not running, script may crash...
+echo Null 服務未執行，腳本可能會當機...
 echo:
 echo:
-echo Check this webpage for help - %mas%fix_service
+echo 請查看此網頁尋求協助 - %mas%fix_service
 echo:
 echo:
 ping 127.0.0.1 -n 20
@@ -99,10 +99,10 @@ cls
 
 >nul findstr /v "$" "%_cmdf%" && (
 echo:
-echo Error - Script either has LF line ending issue or an empty line at the end of the script is missing.
+echo 錯誤 - 腳本的換行格式有 LF 問題，或腳本結尾缺少一行空行。
 echo:
 echo:
-echo Check this webpage for help - %mas%troubleshoot
+echo 請查看此網頁尋求協助 - %mas%troubleshoot
 echo:
 echo:
 ping 127.0.0.1 -n 20 >nul
@@ -113,7 +113,7 @@ exit /b
 
 cls
 color 07
-title  Change Windows Edition %masver%
+title  變更 Windows 版本 %masver%
 
 set _args=
 set _elev=
@@ -141,19 +141,19 @@ set "line=echo _________________________________________________________________
 
 if %winbuild% EQU 1 (
 %eline%
-echo Failed to detect Windows build number.
+echo 無法偵測 Windows 組建編號。
 echo:
 setlocal EnableDelayedExpansion
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
 if exist "%Systemdrive%\Users\WDAGUtilityAccount" (
 sc query gcs | find /i "RUNNING" %nul% && (
 %eline%
-echo Windows Sandbox detected.
-echo The script cannot run due to missing licensing components. Aborting...
+echo 偵測到 Windows Sandbox。
+echo 系統缺少授權元件，腳本無法執行。正在中止...
 echo:
 goto dk_done
 )
@@ -161,8 +161,8 @@ goto dk_done
 
 if %winbuild% LSS 7600 (
 %eline%
-echo Unsupported OS version detected [%winbuild%].
-echo This option is supported only for Windows 7/8/8.1/10/11 and their Server equivalents.
+echo 偵測到不支援的作業系統版本 [%winbuild%]。
+echo 此選項僅支援 Windows 7/8/8.1/10/11 與對應的 Server 版本。
 goto dk_done
 )
 
@@ -187,10 +187,10 @@ setlocal EnableDelayedExpansion
 echo "!_cmdf!" | find /i "!_ttemp!" %nul1% && (
 if /i not "!_work!"=="!_ttemp!" (
 %eline%
-echo The script was launched from the temp folder.
-echo You are most likely running the script directly from the archive file.
+echo 腳本是從暫存資料夾啟動的。
+echo 您很可能是直接在壓縮檔內執行腳本。
 echo:
-echo Extract the archive file and launch the script from the extracted folder.
+echo 請先解壓縮檔案，再從解壓後的資料夾啟動腳本。
 goto dk_done
 )
 )
@@ -202,8 +202,8 @@ goto dk_done
 %nul1% fltmc || (
 if not defined _elev %psc% "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
 %eline%
-echo This script needs admin rights.
-echo Right click on this script and select 'Run as administrator'.
+echo 此腳本需要系統管理員權限。
+echo 請以滑鼠右鍵按一下此腳本，然後選擇「以系統管理員身分執行」。
 goto dk_done
 )
 
@@ -213,31 +213,31 @@ goto dk_done
 
 ::pstst $ExecutionContext.SessionState.LanguageMode :pstst
 
-for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!') -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
+for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
 
 if /i not "%tstresult%"=="FullLanguage" (
 %eline%
 for /f "delims=" %%a in ('%psc% "$ExecutionContext.SessionState.LanguageMode" %nul6%') do (set tstresult2=%%a)
-echo Test 1 - %tstresult%
-echo Test 2 - !tstresult2!
+echo 測試 1 - %tstresult%
+echo 測試 2 - !tstresult2!
 echo:
 
 REM check LanguageMode
 
 echo: !tstresult2! | findstr /i "ConstrainedLanguage RestrictedLanguage NoLanguage" %nul1% && (
-echo FullLanguage mode not found in PowerShell. Aborting...
-echo If you have applied restrictions on Powershell then undo those changes.
+echo PowerShell 未處於 FullLanguage 模式。正在中止...
+echo 如果您曾對 PowerShell 套用限制，請先復原那些變更。
 set fixes=%fixes% %mas%fix_powershell
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%fix_powershell"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%fix_powershell"
 goto dk_done
 )
 
 REM check Powershell core version
 
 cmd /c "%psc% "$PSVersionTable.PSEdition"" | find /i "Core" %nul1% && (
-echo Windows Powershell is needed for MAS but it seems to be replaced with Powershell core. Aborting...
+echo MAS 需要 Windows PowerShell，但系統中的 PowerShell 似乎已被 PowerShell Core 取代。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 
@@ -245,9 +245,9 @@ REM check for Mal-ware that may cause issues with Powershell
 
 for /r "%ProgramFiles%\" %%f in (secureboot.exe) do if exist "%%f" (
 echo "%%f"
-echo Mal%blank%ware found, PowerShell is not working properly.
+echo 偵測到惡意軟體，PowerShell 無法正常運作。
 set fixes=%fixes% %mas%remove_mal%w%ware
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%remove_mal%w%ware"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%remove_mal%w%ware"
 goto dk_done
 )
 
@@ -256,29 +256,29 @@ REM check if .NET is working properly
 if /i "!tstresult2!"=="FullLanguage" (
 cmd /c "%psc% ""try {[System.AppDomain]::CurrentDomain.GetAssemblies(); [System.Math]::Sqrt(144)} catch {Exit 3}""" %nul%
 if !errorlevel!==3 (
-echo Windows Powershell failed to load .NET command. Aborting...
+echo Windows PowerShell 無法載入 .NET 命令。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 )
 
 REM check antivirus and other errors
 
-echo PowerShell is not working properly. Aborting...
+echo PowerShell 無法正常運作。正在中止...
 
 if /i "!tstresult2!"=="FullLanguage" (
 echo:
-echo Your antivirus software might be blocking the script.
+echo 您的防毒軟體可能封鎖了此腳本。
 echo:
 sc query sense | find /i "RUNNING" %nul% && (
-echo Installed Antivirus - Microsoft Defender for Endpoint
+echo 已安裝的防毒軟體 - Microsoft Defender for Endpoint
 )
 cmd /c "%psc% ""$av = Get-WmiObject -Namespace root\SecurityCenter2 -Class AntiVirusProduct; $n = @(); foreach ($i in $av) { $n += $i.displayName }; if ($n) { Write-Host ('Installed Antivirus - ' + ($n -join ', '))}"""
 )
 
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
@@ -349,14 +349,14 @@ if not "%%C"=="" set old=
 if defined old (
 echo ________________________________________________
 %eline%
-echo Your version of MAS [%masver%] is outdated.
+echo 您的 MAS 版本 [%masver%] 已過期。
 echo ________________________________________________
 echo:
 if not %_unattended%==1 (
-echo [1] Get Latest MAS
-echo [0] Continue Anyway
+echo [1] 取得最新版 MAS
+echo [0] 仍要繼續
 echo:
-call :dk_color %_Green% "Choose a menu option using your keyboard [1,0] :"
+call :dk_color %_Green% "請以鍵盤選擇選單選項 [1,0]："
 choice /C:10 /N
 if !errorlevel!==2 rem
 if !errorlevel!==1 (start %selfgit% & start %github% & start %mas% & exit /b)
@@ -375,7 +375,7 @@ if not defined desktop for /f "delims=" %%a in ('%psc% "& {write-host $([Environ
 
 if not defined desktop (
 %eline%
-echo Unable to detect Desktop location, aborting...
+echo 無法偵測桌面位置，正在中止...
 goto dk_done
 )
 
@@ -385,10 +385,10 @@ setlocal EnableDelayedExpansion
 
 cls
 if not defined terminal mode 98, 30
-title  Change Windows Edition %masver%
+title  變更 Windows 版本 %masver%
 
 echo:
-echo Initializing...
+echo 正在初始化...
 echo:
 
 for %%# in (
@@ -397,11 +397,11 @@ dism.exe
 ) do (
 if not exist %SysPath%\%%# (
 %eline%
-echo [%SysPath%\%%#] file is missing, aborting...
-call :dk_color %Blue% "Go back to Main Menu, select Troubleshoot and run DISM Restore and SFC Scan options."
-call :dk_color %Blue% "After that, restart system and try activation again."
+echo 檔案 [%SysPath%\%%#] 遺失，正在中止...
+call :dk_color %Blue% "請回到主選單，選擇疑難排解，然後執行 DISM 還原與 SFC 掃描選項。"
+call :dk_color %Blue% "完成後重新啟動系統，再重新嘗試啟用。"
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "If it still shows the same error, do this - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "如果仍出現相同錯誤，請這樣做 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 )
@@ -431,8 +431,8 @@ if defined UBR (set "fullbuild=%%G.!UBR!") else (set "fullbuild=%%G.%%H")
 call :dk_actids 55c92734-d682-4d71-983e-d6ec3f16059f
 if not defined allapps (
 %eline%
-echo Failed to find activation IDs. Aborting...
-call :dk_color %Blue% "To fix this issue, activate Windows from the main menu."
+echo 找不到啟用識別碼。正在中止...
+call :dk_color %Blue% "若要修復此問題，請從主選單啟用 Windows。"
 goto dk_done
 )
 
@@ -452,8 +452,8 @@ if not defined osedition %chkedi% do if not errorlevel 1 (call set "osedition=%%
 
 if not defined osedition (
 %eline%
-echo Failed to detect OS edition, aborting...
-call :dk_color %Blue% "To fix this issue, activate Windows from the main menu."
+echo 無法偵測作業系統版本，正在中止...
+call :dk_color %Blue% "若要修復此問題，請從主選單啟用 Windows。"
 goto dk_done
 )
 
@@ -476,7 +476,7 @@ set _ntarget=
 set _wtarget=
 
 if %winbuild% GEQ 10240 for /f "tokens=4" %%a in ('dism /online /english /Get-TargetEditions ^| findstr /i /c:"Target Edition : "') do (if defined _dtarget (set "_dtarget= !_dtarget! %%a ") else (set "_dtarget= %%a "))
-if %winbuild% LSS 10240 for /f "tokens=4" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':cbsxml\:.*';. ([scriptblock]::Create($f[1])) -GetTargetEditions;" ^| findstr /i /c:"Target Edition : "') do (if defined _ptarget (set "_ptarget= !_ptarget! %%a ") else (set "_ptarget= %%a "))
+if %winbuild% LSS 10240 for /f "tokens=4" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':cbsxml\:.*';. ([scriptblock]::Create($f[1])) -GetTargetEditions;" ^| findstr /i /c:"Target Edition : "') do (if defined _ptarget (set "_ptarget= !_ptarget! %%a ") else (set "_ptarget= %%a "))
 
 if %winbuild% GEQ 10240 if not exist "%SystemRoot%\Servicing\Packages\Microsoft-Windows-Server*Edition~*.mum" (
 if %winbuild% GEQ 17063 call :ced_edilist
@@ -490,13 +490,13 @@ set "_dtarget= %_dtarget% !_wtarget! !_pro! "
 for %%# in (CloudEdition CloudEditionN ServerRdsh) do if /i %osedition%==%%# (
 cls
 echo:
-call :dk_color %Red% "==== Note ===="
+call :dk_color %Red% "==== 注意 ===="
 echo:
 echo [EditionID:%osedition% ^| %fullbuild%]
 echo:
-echo Changing this edition may not remove "%osedition%"-specific features.
+echo 變更此版本可能無法移除「%osedition%」專屬的功能。
 echo:
-call :dk_color %_Yellow% "Press [7] to continue anyway..."
+call :dk_color %_Yellow% "按 [7] 仍要繼續..."
 choice /c 7 /n
 cls
 )
@@ -515,8 +515,8 @@ if not defined _ntarget (
 %line%
 echo:
 if defined dismnotworking call :dk_color %Red% "DISM.exe is not working."
-call :dk_color %Gray% "Target editions not found."
-echo Current Edition [%osedition% ^| %winbuild%] can not be changed to any other Edition.
+call :dk_color %Gray% "找不到目標版本。"
+echo 目前的版本 [%osedition% ^| %winbuild%] 無法變更為任何其他版本。
 %line%
 goto dk_done
 )
@@ -534,10 +534,10 @@ set targetedition=
 
 %line%
 echo:
-call :dk_color %Gray% "You can change the edition [%osedition%] [%fullbuild%] to one of the following."
+call :dk_color %Gray% "您可以將版本 [%osedition%] [%fullbuild%] 變更為下列其中之一。"
 %showeditionerror%
 if defined dismnotworking (
-call :dk_color %_Yellow% "Note - DISM.exe is not working."
+call :dk_color %_Yellow% "注意 - DISM.exe 無法運作。"
 if /i "%osedition:~0,4%"=="Core" call :dk_color %_Yellow% "     - You will see more edition options to choose once its changed to Pro."
 )
 %line%
@@ -546,7 +546,7 @@ echo:
 for %%A in (%_ntarget%) do (
 set /a counter+=1
 if /i %%A==IoTEnterprise (
-echo [!counter!]  %%A [GAC, not LTSC]
+echo [!counter!]  %%A [GAC，非 LTSC]
 ) else (
 echo [!counter!]  %%A
 )
@@ -557,7 +557,7 @@ set targetedition!counter!=%%A
 echo:
 echo [0]  %_exitmsg%
 echo:
-call :dk_color %_Green% "Enter an option number using your keyboard and press Enter to confirm:"
+call :dk_color %_Green% "請以鍵盤輸入選項數字，並按 Enter 確認："
 set /p inpt=
 if "%inpt%"=="" goto cedmenu2
 if "%inpt%"=="0" exit /b
@@ -575,15 +575,15 @@ if not defined terminal mode con cols=105 lines=32
 
 if /i "%targetedition%"=="ServerRdsh" (
 echo:
-call :dk_color %Red% "==== Note ===="
+call :dk_color %Red% "==== 注意 ===="
 echo:
-echo Once the edition is changed to "%targetedition%", 
-echo the system may not be able to properly change edition later.
+echo 當版本變更為「%targetedition%」後，
+echo 系統之後可能無法正常變更版本。
 echo:
-echo [1] Continue Anyway
-echo [0] Go Back
+echo [1] 仍要繼續
+echo [0] 返回
 echo:
-call :dk_color %_Green% "Choose a menu option using your keyboard [1,0] :"
+call :dk_color %_Green% "請以鍵盤選擇選單選項 [1,0]："
 choice /C:10 /N
 if !errorlevel!==2 goto cedmenu2
 if !errorlevel!==1 rem
@@ -616,9 +616,9 @@ set _chan=Retail
 if not defined key (
 %eline%
 echo [%targetedition% ^| %winbuild%]
-echo Failed to get product key from pkeyhelper.dll.
+echo 無法從 pkeyhelper.dll 取得產品金鑰。
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
@@ -638,25 +638,25 @@ cls
 echo:
 %showeditionerror%
 if defined dismnotworking call :dk_color %_Yellow% "DISM.exe is not working."
-echo Changing the current edition [%osedition%] %fullbuild% to [%targetedition%]...
+echo 正在將目前版本 [%osedition%] %fullbuild% 變更為 [%targetedition%]...
 echo:
 
 if %_dismapi%==1 (
-call :dk_color %Green% "Notes -"
+call :dk_color %Green% "注意事項 -"
 echo:
-echo  - Save your work before continuing, the system will auto-restart.
+echo  - 繼續之前請先儲存您的工作，系統將會自動重新啟動。
 echo:
-echo  - You will need to activate with HWID option once the edition is changed.
+echo  - 版本變更後，您需要使用 HWID 選項來啟用。
 %line%
 echo:
-choice /C:21 /N /M "[1] Continue [2] %_exitmsg% : "
+choice /C:21 /N /M "[1] 繼續 [2] %_exitmsg% : "
 if !errorlevel!==1 exit /b
 )
 
 ::========================================================================================================================================
 
 if %_dismapi%==0 (
-echo Installing %_chan% key [%key%]
+echo 正在安裝 %_chan% 金鑰 [%key%]
 echo:
 if %_wmic% EQU 1 wmic path %sps% where __CLASS='%sps%' call InstallProductKey ProductKey="%key%" %nul%
 if %_wmic% EQU 0 %psc% "try { $null=(([WMISEARCHER]'SELECT Version FROM %sps%').Get()).InstallProductKey('%key%'); exit 0 } catch { exit $_.Exception.InnerException.HResult }" %nul%
@@ -666,25 +666,25 @@ if !keyerror! NEQ 0 set "keyerror=[0x!=ExitCode!]"
 
 if !keyerror! EQU 0 (
 call :dk_refresh
-call :dk_color %Green% "[Successful]"
+call :dk_color %Green% "[成功]"
 echo:
-call :dk_color %Gray% "Reboot is required to fully change the edition."
+call :dk_color %Gray% "需要重新開機才能完整變更版本。"
 ) else (
-call :dk_color %Red% "[Unsuccessful] [Error Code: !keyerror!]"
+call :dk_color %Red% "[未成功] [錯誤碼: !keyerror!]"
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 )
 )
 
 if %_dismapi%==1 (
 echo:
-echo Applying the DISM API method with %_chan% key %key%. Please wait...
+echo 正在使用 %_chan% 金鑰 %key% 套用 DISM API 方式。請稍候...
 echo:
 
 call :ced_prep
 if defined preperror goto dk_done
 
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':dismapi\:.*';. ([scriptblock]::Create($f[1])) %targetedition% %key%"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':dismapi\:.*';. ([scriptblock]::Create($f[1])) %targetedition% %key%"
 call :ced_postprep
 )
 %line%
@@ -707,22 +707,22 @@ if defined rebootreq goto dk_done
 echo:
 %showeditionerror%
 if defined dismnotworking call :dk_color %_Yellow% "Note - DISM.exe is not working."
-echo Changing the current edition [%osedition%] %fullbuild% to [%targetedition%]...
+echo 正在將目前版本 [%osedition%] %fullbuild% 變更為 [%targetedition%]...
 echo:
-call :dk_color %Blue% "Important - Save your work before continuing, the system will auto-restart."
+call :dk_color %Blue% "重要 - 繼續之前請先儲存您的工作，系統將會自動重新啟動。"
 echo:
-choice /C:01 /N /M "[1] Continue [0] %_exitmsg% : "
+choice /C:01 /N /M "[1] 繼續 [0] %_exitmsg% : "
 if %errorlevel%==1 exit /b
 
 echo:
-echo Initializing...
+echo 正在初始化...
 echo:
 
 call :ced_prep
 if defined preperror goto dk_done
 
 if %_stg%==0 (set stage=) else (set stage=-StageCurrent)
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':cbsxml\:.*';. ([scriptblock]::Create($f[1])) -SetEdition %targetedition% %stage%"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':cbsxml\:.*';. ([scriptblock]::Create($f[1])) -SetEdition %targetedition% %stage%"
 call :ced_postprep
 %line%
 
@@ -750,9 +750,9 @@ if not defined key call :changeeditiondata
 if not defined key (
 %eline%
 echo [%targetedition% ^| %winbuild%]
-echo Failed to get product key from pkeyhelper.dll.
+echo 無法從 pkeyhelper.dll 取得產品金鑰。
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
@@ -763,13 +763,13 @@ cls
 echo:
 %showeditionerror%
 if defined dismnotworking call :dk_color %_Yellow% "Note - DISM.exe is not working."
-echo Changing the current edition [%osedition%] %fullbuild% to [%targetedition%]...
+echo 正在將目前版本 [%osedition%] %fullbuild% 變更為 [%targetedition%]...
 echo:
 
 call :ced_prep
 if defined preperror goto dk_done
 
-echo Applying the command with %_chan% key...
+echo 正在使用 %_chan% 金鑰套用命令...
 echo DISM /online /Set-Edition:%targetedition% /ProductKey:%key% /AcceptEula
 DISM /online /Set-Edition:%targetedition% /ProductKey:%key% /AcceptEula
 
@@ -791,8 +791,8 @@ for /f %%a in ('%psc% "(Get-Date).ToString('yyyyMMdd-HHmmssfff')"') do set _time
 
 sc query TrustedInstaller | find /i "RUNNING" %nul% && (
 %eline%
-echo Failed to stop the TrustedInstaller service.
-echo Reboot your machine using the restart option and try again.
+echo 無法停止 TrustedInstaller 服務。
+echo 請使用「重新啟動」選項重新開機，然後再試一次。
 set preperror=1
 exit /b
 )
@@ -823,12 +823,12 @@ call :compresslog DISM\dism_%_time%.log ChangeEdition_Logs\DISM %nul%
 
 echo:
 if %winbuild% GEQ 9200 %psc% "if ((Get-WindowsOptionalFeature -Online -FeatureName NetFx3).State -eq 'Enabled') {Write-Host 'Checking .NET Framework 3.5 Status - Enabled'}"
-echo Log files are copied to the ChangeEdition_Logs folder on your desktop.
+echo 記錄檔已複製到桌面上的 ChangeEdition_Logs 資料夾。
 echo:
-call :dk_color %Blue% "In case there are errors, you should restart the system before trying again."
+call :dk_color %Blue% "如果出現錯誤，請先重新啟動系統再試一次。"
 echo:
 set fixes=%fixes% %mas%change_edition_issues
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%change_edition_issues"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%change_edition_issues"
 exit /b
 
 :compresslog
@@ -909,11 +909,11 @@ set "_Yellow="Black" "Yellow""
 set "nceline=echo: &echo ==== ERROR ==== &echo:"
 set "eline=echo: &call :dk_color %Red% "==== ERROR ====" &echo:"
 if %~z0 GEQ 200000 (
-set "_exitmsg=Go back"
-set "_fixmsg=Go back to Main Menu, select Troubleshoot and run Fix Licensing option."
+set "_exitmsg=返回"
+set "_fixmsg=請回到主選單，選擇疑難排解，然後執行修復授權選項。"
 ) else (
-set "_exitmsg=Exit"
-set "_fixmsg=In MAS folder, run Troubleshoot script and select Fix Licensing option."
+set "_exitmsg=離開"
+set "_fixmsg=請在 MAS 資料夾執行疑難排解腳本，並選擇修復授權選項。"
 )
 exit /b
 
@@ -966,10 +966,10 @@ set spperror=%errorlevel%
 
 if %spperror% NEQ 1056 if %spperror% NEQ 0 (
 %eline%
-echo sc start %_slser% [Error Code: %spperror%]
+echo sc start %_slser% [錯誤碼: %spperror%]
 if %spperror% EQU 1053 (
-call :dk_color %Blue% "Reboot your machine using the restart option and try again."
-call :dk_color %Blue% "If it still does not work, go back to Main Menu, select Troubleshoot and run Fix WPA Registry option."
+call :dk_color %Blue% "請使用「重新啟動」選項重新開機，然後再試一次。"
+call :dk_color %Blue% "如果仍然無效，請回到主選單，選擇疑難排解，然後執行修復 WPA 登錄檔選項。"
 )
 )
 
@@ -998,9 +998,9 @@ reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Upd
 
 if defined rebootreq (
 %eline%
-echo Pending reboot flags found.
+echo 發現擱置中的重新開機旗標。
 echo:
-echo Make sure Windows is fully updated, restart the system and try again.
+echo 請確認 Windows 已完整更新，重新啟動系統後再試一次。
 )
 exit /b
 
@@ -1098,18 +1098,18 @@ echo:
 if %_unattended%==1 timeout /t 2 & exit /b
 
 if defined fixes (
-call :dk_color %White% "Follow ALL the ABOVE blue lines.   "
-call :dk_color2 %Blue% "Press [1] to Open Support Webpage " %Gray% " Press [0] to Go Back"
+call :dk_color %White% "請遵循上方所有藍色文字的指示。   "
+call :dk_color2 %Blue% "按 [1] 開啟支援網頁 " %Gray% " 按 [0] 返回"
 choice /C:10 /N
 if !errorlevel!==2 exit /b
 if !errorlevel!==1 (start %selfgit% & start %github% & for %%# in (%fixes%) do (start %%#))
 )
 
 if defined terminal (
-call :dk_color %_Yellow% "Press [0] key to %_exitmsg%..."
+call :dk_color %_Yellow% "按 [0] 鍵以%_exitmsg%..."
 choice /c 0 /n
 ) else (
-call :dk_color %_Yellow% "Press any key to %_exitmsg%..."
+call :dk_color %_Yellow% "按任意鍵以%_exitmsg%..."
 pause %nul1%
 )
 
@@ -1211,14 +1211,14 @@ function Write-UpgradeCandidates {
     )
 
     $editionCount = 0
-    Write-Host 'Editions that can be upgraded to:'
+        Write-Host '可升級至的版本：'
     foreach($candidate in $InstallCandidates.Keys) {
         Write-Host "Target Edition : $candidate"
         $editionCount++
     }
 
     if($editionCount -eq 0) {
-        Write-Host '(no editions are available)'
+                Write-Host '（沒有可用的版本）'
     }
 }
 
@@ -1297,7 +1297,7 @@ if($getTargetsParam) {
 }
 
 if($false -eq ($installCandidates.Keys -contains $SetEdition)) {
-    Write-Error "The system cannot be upgraded to `"$SetEdition`""
+        Write-Error "系統無法升級到 `"$SetEdition`""
     Exit 1
 }
 
@@ -1309,10 +1309,10 @@ Write-UpgradeXml -RemovalCandidates $removalCandidates `
 
 $editionXml = Find-EditionXml -Edition $SetEdition
 if($null -eq $editionXml) {
-    Write-Warning 'Unable to find edition specific settings XML. Proceeding without it...'
+        Write-Warning '找不到版本專屬設定 XML。將在沒有它的情況下繼續...'
 }
 
-Write-Host 'Starting the upgrade process. This may take a while...'
+Write-Host '正在開始升級程序。這可能需要一段時間...'
 
 DISM.EXE /English /NoRestart /Online /Apply-Unattend:$xmlPath
 $dismError = $LASTEXITCODE
@@ -1320,7 +1320,7 @@ $dismError = $LASTEXITCODE
 Remove-Item -Path $xmlPath -Force
 
 if(($dismError -ne 0) -and ($dismError -ne 3010)) {
-    Write-Error 'Failed to upgrade to the target edition'
+        Write-Error '升級到目標版本失敗'
     Exit $dismError
 }
 
@@ -1332,7 +1332,7 @@ if($null -ne $editionXml) {
     $dismError = $LASTEXITCODE
 
     if(($dismError -ne 0) -and ($dismError -ne 3010)) {
-        Write-Error 'Failed to apply edition specific settings'
+                Write-Error '套用版本專屬設定失敗'
         Exit $dismError
     }
 }

@@ -40,25 +40,25 @@ call :arg_workaround
 
 set "ps=%SysPath%\WindowsPowerShell\v1.0\powershell.exe"
 set "_psc=%ps% -nop -c"
-set "_err===== ERROR ===="
+set "_err===== 錯誤 ===="
 set _pwsh=1
 if not exist %ps% set _pwsh=0
 cmd /c "%_psc% "$ExecutionContext.SessionState.LanguageMode"" | find /i "FullLanguage" 1>nul || (set _pwsh=0)
 if %_pwsh% equ 0 (
 echo %_err%
 cmd /c "%_psc% "$ExecutionContext.SessionState.LanguageMode""
-echo Windows PowerShell is not working correctly.
-echo It is required for this script to work.
+echo Windows PowerShell 無法正常運作。
+echo 此腳本需要它才能運作。
 goto :E_Exit
 )
 set "_batf=%~f0"
 set "_batp=%_batf:'=''%"
 setlocal EnableDelayedExpansion
-%_psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':sppmgr\:.*';. ([scriptblock]::Create($f[1]))"
+%_psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':sppmgr\:.*';. ([scriptblock]::Create($f[1]))"
 
 :E_Exit
 echo.
-echo Press 0 key to exit.
+echo 按 0 鍵離開。
 choice /c 0 /n
 exit /b
 
@@ -89,14 +89,14 @@ function ExitScript($ExitCode = 0)
 }
 
 if (-Not $PSVersionTable) {
-	"==== ERROR ====`r`n"
-	"Windows PowerShell 1.0 is not supported by this script."
+	"==== 錯誤 ====`r`n"
+	"此腳本不支援 Windows PowerShell 1.0。"
 	ExitScript 1
 }
 
 if ($ExecutionContext.SessionState.LanguageMode.value__ -NE 0) {
-	"==== ERROR ====`r`n"
-	"Windows PowerShell is not running in Full Language Mode."
+	"==== 錯誤 ====`r`n"
+	"Windows PowerShell 未在 Full Language 模式執行。"
 	ExitScript 1
 }
 
@@ -108,14 +108,14 @@ try {
 }
 
 if ($winbuild -EQ 1) {
-	"==== ERROR ====`r`n"
-	"Could not detect Windows build."
+	"==== 錯誤 ====`r`n"
+	"無法偵測 Windows 組建。"
 	ExitScript 1
 }
 
 if ($winbuild -LT 2600) {
-	"==== ERROR ====`r`n"
-	"This build of Windows is not supported by this script."
+	"==== 錯誤 ====`r`n"
+	"此腳本不支援這個 Windows 組建。"
 	ExitScript 1
 }
 
@@ -145,7 +145,7 @@ $line3 = "____________________________________________________________"
 function echoWindows
 {
 	CONOUT "$line2"
-	CONOUT "===                   Windows Status                     ==="
+	CONOUT "===                   Windows 狀態                      ==="
 	CONOUT "$line2"
 	& $noAll
 }
@@ -158,7 +158,7 @@ function echoOffice
 
 	& $isAll
 	CONOUT "$line2"
-	CONOUT "===                   Office Status                      ==="
+	CONOUT "===                   Office 狀態                       ==="
 	CONOUT "$line2"
 	& $noAll
 
@@ -204,7 +204,7 @@ function CheckOhook
 
 	& $isAll
 	CONOUT "$line2"
-	CONOUT "===                Office Ohook Status                   ==="
+	CONOUT "===                Office Ohook 狀態                    ==="
 	CONOUT "$line2"
 	$host.UI.WriteLine('Yellow', 'Black', "`r`nOhook for permanent Office activation is installed.`r`nYou can ignore the below mentioned Office activation status.")
 	& $noAll
@@ -498,73 +498,73 @@ function DetectSubscription {
 	}
 
 	if ($objSvc.SubscriptionType -EQ 1) {
-		$SubMsgType = "Device based"
+		$SubMsgType = "以裝置為基礎"
 	} else {
-		$SubMsgType = "User based"
+		$SubMsgType = "以使用者為基礎"
 	}
 
 	if ($objSvc.SubscriptionStatus -EQ 120) {
-		$SubMsgStatus = "Expired"
+		$SubMsgStatus = "已過期"
 	} elseif ($objSvc.SubscriptionStatus -EQ 100) {
-		$SubMsgStatus = "Disabled"
+		$SubMsgStatus = "已停用"
 	} elseif ($objSvc.SubscriptionStatus -EQ 1) {
-		$SubMsgStatus = "Active"
+		$SubMsgStatus = "使用中"
 	} else {
-		$SubMsgStatus = "Not active"
+		$SubMsgStatus = "未啟用"
 	}
 
-	$SubMsgExpiry = "Unknown"
+	$SubMsgExpiry = "未知"
 	if ($objSvc.SubscriptionExpiry) {
 		if ($objSvc.SubscriptionExpiry.Contains("unspecified") -EQ $false) {$SubMsgExpiry = $objSvc.SubscriptionExpiry}
 	}
 
-	$SubMsgEdition = "Unknown"
+	$SubMsgEdition = "未知"
 	if ($objSvc.SubscriptionEdition) {
 		if ($objSvc.SubscriptionEdition.Contains("UNKNOWN") -EQ $false) {$SubMsgEdition = $objSvc.SubscriptionEdition}
 	}
 
-	CONOUT "`nSubscription information:"
-	CONOUT "    Type   : $SubMsgType"
-	CONOUT "    Status : $SubMsgStatus"
-	CONOUT "    Edition: $SubMsgEdition"
-	CONOUT "    Expiry : $SubMsgExpiry"
+	CONOUT "`n訂閱資訊："
+	CONOUT "    類型   : $SubMsgType"
+	CONOUT "    狀態 : $SubMsgStatus"
+	CONOUT "    版本: $SubMsgEdition"
+	CONOUT "    到期 : $SubMsgExpiry"
 }
 
 function DetectAdbaClient
 {
 	$propADBA | foreach { set $_ (SlGetInfoSku $licID $_) }
 	DetectActType
-	CONOUT "`nAD Activation client information:"
-	CONOUT "    Object Name: $ADActivationObjectName"
-	CONOUT "    Domain Name: $ADActivationObjectDN"
-	CONOUT "    CSVLK Extended PID: $ADActivationCsvlkPID"
-	CONOUT "    CSVLK Activation ID: $ADActivationCsvlkSkuID"
+	CONOUT "`nAD 啟用用戶端資訊："
+	CONOUT "    物件名稱: $ADActivationObjectName"
+	CONOUT "    網域名稱: $ADActivationObjectDN"
+	CONOUT "    CSVLK 延伸 PID: $ADActivationCsvlkPID"
+	CONOUT "    CSVLK 啟用識別碼: $ADActivationCsvlkSkuID"
 }
 
 function DetectAvmClient
 {
 	$propAVMA | foreach { set $_ (SlGetInfoSku $licID $_) }
-	CONOUT "`nAutomatic VM Activation client information:"
+	CONOUT "`n自動 VM 啟用用戶端資訊："
 	if (-Not [String]::IsNullOrEmpty($InheritedActivationId)) {
 		CONOUT "    Guest IAID: $InheritedActivationId"
 	} else {
-		CONOUT "    Guest IAID: Not Available"
+		CONOUT "    Guest IAID: 無"
 	}
 	if (-Not [String]::IsNullOrEmpty($InheritedActivationHostMachineName)) {
-		CONOUT "    Host machine name: $InheritedActivationHostMachineName"
+		CONOUT "    主機機器名稱: $InheritedActivationHostMachineName"
 	} else {
-		CONOUT "    Host machine name: Not Available"
+		CONOUT "    主機機器名稱: 無"
 	}
 	if (-Not [String]::IsNullOrEmpty($InheritedActivationHostDigitalPid2)) {
 		CONOUT "    Host Digital PID2: $InheritedActivationHostDigitalPid2"
 	} else {
-		CONOUT "    Host Digital PID2: Not Available"
+		CONOUT "    Host Digital PID2: 無"
 	}
 	if ($InheritedActivationActivationTime) {
 		$IAAT = [DateTime]::FromFileTime($InheritedActivationActivationTime).ToString('yyyy-MM-dd hh:mm:ss tt')
-		CONOUT "    Activation time: $IAAT"
+		CONOUT "    啟用時間: $IAAT"
 	} else {
-		CONOUT "    Activation time: Not Available"
+		CONOUT "    啟用時間: 無"
 	}
 }
 
@@ -605,23 +605,23 @@ function DetectKmsHost
 	$KMSRequests = $KeyManagementServiceTotalRequests
 	$NoRequests = ($null -EQ $KMSRequests) -Or ($KMSRequests -EQ -1) -Or ($KMSRequests -EQ 4294967295)
 
-	CONOUT "`nKey Management Service host information:"
-	CONOUT "    Current count: $KeyManagementServiceCurrentCount"
-	CONOUT "    Listening on Port: $KMSListening"
-	CONOUT "    DNS publishing: $KMSPublishing"
-	CONOUT "    KMS priority: $KMSPriority"
+	CONOUT "`nKMS 服務主機資訊："
+	CONOUT "    目前的計數: $KeyManagementServiceCurrentCount"
+	CONOUT "    接聽連接埠: $KMSListening"
+	CONOUT "    DNS 發佈: $KMSPublishing"
+	CONOUT "    KMS 優先權: $KMSPriority"
 	if ($NoRequests) {
 		return
 	}
-	CONOUT "`nKey Management Service cumulative requests received from clients:"
-	CONOUT "    Total: $KeyManagementServiceTotalRequests"
-	CONOUT "    Failed: $KeyManagementServiceFailedRequests"
-	CONOUT "    Unlicensed: $KeyManagementServiceUnlicensedRequests"
-	CONOUT "    Licensed: $KeyManagementServiceLicensedRequests"
-	CONOUT "    Initial grace period: $KeyManagementServiceOOBGraceRequests"
-	CONOUT "    Expired or Hardware out of tolerance: $KeyManagementServiceOOTGraceRequests"
-	CONOUT "    Non-genuine grace period: $KeyManagementServiceNonGenuineGraceRequests"
-	if ($null -NE $KeyManagementServiceNotificationRequests) {CONOUT "    Notification: $KeyManagementServiceNotificationRequests"}
+	CONOUT "`nKMS 服務從用戶端收到的累計要求："
+	CONOUT "    總計: $KeyManagementServiceTotalRequests"
+	CONOUT "    失敗: $KeyManagementServiceFailedRequests"
+	CONOUT "    未啟用: $KeyManagementServiceUnlicensedRequests"
+	CONOUT "    已啟用: $KeyManagementServiceLicensedRequests"
+	CONOUT "    初始寬限期: $KeyManagementServiceOOBGraceRequests"
+	CONOUT "    已過期或硬體超出容許範圍: $KeyManagementServiceOOTGraceRequests"
+	CONOUT "    非正版寬限期: $KeyManagementServiceNonGenuineGraceRequests"
+	if ($null -NE $KeyManagementServiceNotificationRequests) {CONOUT "    通知: $KeyManagementServiceNotificationRequests"}
 }
 
 function DetectActType
@@ -630,7 +630,7 @@ function DetectActType
 	if ($null -EQ $VLType) {$VLType = strGetRegistry ($SPKeyPath + '\' + $strApp) "VLActivationType"}
 	if ($null -EQ $VLType) {$VLType = strGetRegistry ($SPKeyPath) "VLActivationType"}
 	if ($null -EQ $VLType -Or $VLType -GT 3) {$VLType = 0}
-	if ($null -NE $VLType) {CONOUT "Configured Activation Type: $($VLActTypes[$VLType])"}
+	if ($null -NE $VLType) {CONOUT "設定的啟用類型: $($VLActTypes[$VLType])"}
 }
 
 function DetectKmsClient
@@ -638,7 +638,7 @@ function DetectKmsClient
 	if ($win8) {DetectActType}
 	CONOUT "`r"
 	if ($LicenseStatus -NE 1) {
-		CONOUT "Please activate the product in order to update KMS client information values."
+		CONOUT "請啟用產品，以更新 KMS 用戶端資訊值。"
 		return
 	}
 
@@ -666,11 +666,11 @@ function DetectKmsClient
 	}
 
 	if ([String]::IsNullOrEmpty($DiscoveredKeyManagementServiceName)) {
-		$KmsDns = "DNS auto-discovery: KMS name not available"
+		$KmsDns = "DNS 自動探索: 找不到 KMS 名稱"
 		if ($Vista -And -Not $Admin) {$KmsDns = "DNS auto-discovery: Run the script as administrator to retrieve info"}
 	} else {
 		if (-Not $DiscoveredKeyManagementServicePort) {$DiscoveredKeyManagementServicePort = 1688}
-		$KmsDns = "KMS machine name from DNS: ${DiscoveredKeyManagementServiceName}:${DiscoveredKeyManagementServicePort}"
+		$KmsDns = "來自 DNS 的 KMS 機器名稱: ${DiscoveredKeyManagementServiceName}:${DiscoveredKeyManagementServicePort}"
 	}
 
 	if ($null -NE $KMSCaching) {
@@ -683,20 +683,20 @@ function DetectKmsClient
 		}
 	}
 
-	CONOUT "Key Management Service client information:"
-	CONOUT "    Client Machine ID (CMID): $ClientMachineID"
+	CONOUT "KMS 服務用戶端資訊："
+	CONOUT "    用戶端機器識別碼（CMID）: $ClientMachineID"
 	if ($null -EQ $KmsReg) {
 		CONOUT "    $KmsDns"
-		CONOUT "    Registered KMS machine name: KMS name not available"
+		CONOUT "    已註冊的 KMS 機器名稱: 找不到 KMS 名稱"
 	} else {
 		CONOUT "    $KmsReg"
 	}
-	if ($null -NE $DiscoveredKeyManagementServiceIpAddress) {CONOUT "    KMS machine IP address: $DiscoveredKeyManagementServiceIpAddress"}
-	CONOUT "    KMS machine extended PID: $CustomerPID"
-	CONOUT "    Activation interval: $VLActivationInterval minutes"
-	CONOUT "    Renewal interval: $VLRenewalInterval minutes"
-	if ($null -NE $KMSCaching) {CONOUT "    KMS host caching: $KMSCaching"}
-	if (-Not [String]::IsNullOrEmpty($KeyManagementServiceLookupDomain)) {CONOUT "    KMS SRV record lookup domain: $KeyManagementServiceLookupDomain"}
+	if ($null -NE $DiscoveredKeyManagementServiceIpAddress) {CONOUT "    KMS 機器 IP 位址: $DiscoveredKeyManagementServiceIpAddress"}
+	CONOUT "    KMS 機器延伸 PID: $CustomerPID"
+	CONOUT "    啟用間隔: $VLActivationInterval 分鐘"
+	CONOUT "    續約間隔: $VLRenewalInterval 分鐘"
+	if ($null -NE $KMSCaching) {CONOUT "    KMS 主機快取: $KMSCaching"}
+	if (-Not [String]::IsNullOrEmpty($KeyManagementServiceLookupDomain)) {CONOUT "    KMS SRV 記錄查詢網域: $KeyManagementServiceLookupDomain"}
 }
 
 function GetResult($strSLP, $strApp, $entry)
@@ -724,13 +724,13 @@ function GetResult($strSLP, $strApp, $entry)
 
 	if ($LicenseStatus -EQ 0 -And !$isPPK) {
 		& $isAll
-		CONOUT "Name: $Name"
-		CONOUT "Description: $Description"
-		CONOUT "Activation ID: $licID"
-		CONOUT "License Status: Unlicensed"
+		CONOUT "名稱: $Name"
+		CONOUT "描述: $Description"
+		CONOUT "啟用識別碼: $licID"
+		CONOUT "授權狀態: 未啟用"
 		if ($licPHN -NE "empty") {
 			$gPHN = [String]::IsNullOrEmpty($licPHN) -NE $true
-			CONOUT "Phone activatable: $($gPHN.ToString())"
+			CONOUT "可透過電話啟用: $($gPHN.ToString())"
 		}
 		return
 	}
@@ -758,45 +758,45 @@ function GetResult($strSLP, $strApp, $entry)
 
 	$LicenseMsg = "Time remaining: $gprMnt minute(s) ($gprDay day(s))"
 	if ($LicenseStatus -EQ 0) {
-		$LicenseInf = "Unlicensed"
+		$LicenseInf = "未啟用"
 		$LicenseMsg = $null
 	}
 	if ($LicenseStatus -EQ 1) {
-		$LicenseInf = "Licensed"
+		$LicenseInf = "已啟用"
 		if ($gprMnt -EQ 0) {
 			$LicenseMsg = $null
-			$ExpireMsg = "The $prmnt is permanently activated."
+			$ExpireMsg = "$prmnt 已永久啟用。"
 		} else {
 			$LicenseMsg = "$actTag activation expiration: $gprMnt minute(s) ($gprDay day(s))"
 			if ($inGrace) {$ExpireMsg = "$actTag activation will expire $_xpr"}
 		}
 	}
 	if ($LicenseStatus -EQ 2) {
-		$LicenseInf = "Initial grace period"
+		$LicenseInf = "初始寬限期"
 		if ($inGrace) {$ExpireMsg = "$LicenseInf ends $_xpr"}
 	}
 	if ($LicenseStatus -EQ 3) {
-		$LicenseInf = "Additional grace period (KMS license expired or hardware out of tolerance)"
+		$LicenseInf = "額外寬限期（KMS 授權已過期或硬體超出容許範圍）"
 		if ($inGrace) {$ExpireMsg = "Additional grace period ends $_xpr"}
 	}
 	if ($LicenseStatus -EQ 4) {
-		$LicenseInf = "Non-genuine grace period"
+		$LicenseInf = "非正版寬限期"
 		if ($inGrace) {$ExpireMsg = "$LicenseInf ends $_xpr"}
 	}
 	if ($LicenseStatus -EQ 5 -And -Not $NT5) {
 		$LicenseReason = '0x{0:X}' -f $LicReason
-		$LicenseInf = "Notification"
+		$LicenseInf = "通知"
 		$LicenseMsg = "Notification Reason: $LicenseReason"
 		if ($LicenseReason -EQ "0xC004F00F") {if ($null -NE $cKmsClient) {$LicenseMsg = $LicenseMsg + " (KMS license expired)."} else {$LicenseMsg = $LicenseMsg + " (hardware out of tolerance)."}}
 		if ($LicenseReason -EQ "0xC004F200") {$LicenseMsg = $LicenseMsg + " (non-genuine)."}
 		if ($LicenseReason -EQ "0xC004F009" -Or $LicenseReason -EQ "0xC004F064") {$LicenseMsg = $LicenseMsg + " (grace time expired)."}
 	}
 	if ($LicenseStatus -GT 5 -Or ($LicenseStatus -GT 4 -And $NT5)) {
-		$LicenseInf = "Unknown"
+		$LicenseInf = "未知"
 		$LicenseMsg = $null
 	}
 	if ($LicenseStatus -EQ 6 -And -Not $Vista -And -Not $NT5) {
-		$LicenseInf = "Extended grace period"
+		$LicenseInf = "延長寬限期"
 		if ($inGrace) {$ExpireMsg = "$LicenseInf ends $_xpr"}
 	}
 
@@ -846,35 +846,35 @@ function GetResult($strSLP, $strApp, $entry)
 	}
 
 	& $isAll
-	CONOUT "Name: $Name"
-	CONOUT "Description: $Description"
-	CONOUT "Activation ID: $licID"
-	if ($null -NE $DigitalPID) {CONOUT "Extended PID: $DigitalPID"}
-	if ($null -NE $DigitalPID2 -And $Dlv) {CONOUT "Product ID: $DigitalPID2"}
-	if ($null -NE $OfflineInstallationId -And $IID) {CONOUT "Installation ID: $OfflineInstallationId"}
-	if ($null -NE $Channel) {CONOUT "Product Key Channel: $Channel"}
-	if ($null -NE $PartialProductKey) {CONOUT "Partial Product Key: $PartialProductKey"}
-	CONOUT "License Status: $LicenseInf"
+	CONOUT "名稱: $Name"
+	CONOUT "描述: $Description"
+	CONOUT "啟用識別碼: $licID"
+	if ($null -NE $DigitalPID) {CONOUT "延伸 PID: $DigitalPID"}
+	if ($null -NE $DigitalPID2 -And $Dlv) {CONOUT "產品識別碼: $DigitalPID2"}
+	if ($null -NE $OfflineInstallationId -And $IID) {CONOUT "安裝識別碼: $OfflineInstallationId"}
+	if ($null -NE $Channel) {CONOUT "產品金鑰通道: $Channel"}
+	if ($null -NE $PartialProductKey) {CONOUT "部分產品金鑰: $PartialProductKey"}
+	CONOUT "授權狀態: $LicenseInf"
 	if ($null -NE $LicenseMsg) {CONOUT "$LicenseMsg"}
 	if ($LicenseStatus -NE 0 -And $EvaluationEndDate) {
 		$EED = [DateTime]::FromFileTimeUtc($EvaluationEndDate).ToString('yyyy-MM-dd hh:mm:ss tt')
-		CONOUT "Evaluation End Date: $EED UTC"
+		CONOUT "評估結束日期: $EED UTC"
 	}
 	if ($LicenseStatus -NE 1 -And $licPHN -NE "empty") {
 		$gPHN = [String]::IsNullOrEmpty($licPHN) -NE $true
-		CONOUT "Phone activatable: $($gPHN.ToString())"
+		CONOUT "可透過電話啟用: $($gPHN.ToString())"
 	}
 	if ($Dlv) {
 		if ($null -NE $RemainingSLReArmCount) {
-			CONOUT "Remaining $reapp rearm count: $RemainingSLReArmCount"
+			CONOUT "剩餘 $reapp rearm 計數: $RemainingSLReArmCount"
 		}
 		if ($null -NE $RemainingSkuReArmCount) {
-			CONOUT "Remaining $reapp rearm count: $RemainingAppReArmCount"
-			CONOUT "Remaining SKU rearm count: $RemainingSkuReArmCount"
+			CONOUT "剩餘 $reapp rearm 計數: $RemainingAppReArmCount"
+			CONOUT "剩餘 SKU rearm 計數: $RemainingSkuReArmCount"
 		}
 		if ($LicenseStatus -NE 0 -And $TrustedTime) {
 			$TTD = [DateTime]::FromFileTime($TrustedTime).ToString('yyyy-MM-dd hh:mm:ss tt')
-			CONOUT "Trusted time: $TTD"
+			CONOUT "信任時間: $TTD"
 		}
 	}
 	if (!$isPPK) {
@@ -958,7 +958,7 @@ function PrintModePerPridFromRegistry
 	$vNextPrids = Get-Item -Path $vNextRegkey -ErrorAction SilentlyContinue | Select-Object -ExpandProperty 'property' -ErrorAction SilentlyContinue | Where-Object -FilterScript {$_.ToLower() -like "*retail" -or $_.ToLower() -like "*volume"}
 	If ($null -Eq $vNextPrids)
 	{
-		CONOUT "`nNo registry keys found."
+		CONOUT "`n找不到登錄檔機碼。"
 		Return
 	}
 	CONOUT "`r"
@@ -985,7 +985,7 @@ function PrintSharedComputerLicensing
 	$scaPolicyValue = Get-ItemProperty -Path $scaPolicyKey -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "SharedComputerLicensing" -ErrorAction SilentlyContinue
 	If ($null -Eq $scaValue -And $null -Eq $scaValue2 -And $null -Eq $scaPolicyValue)
 	{
-		CONOUT "`nNo registry keys found."
+		CONOUT "`n找不到登錄檔機碼。"
 		Return
 	}
 	$scaModeValue = $scaValue -Or $scaValue2 -Or $scaPolicyValue
@@ -997,7 +997,7 @@ function PrintSharedComputerLicensing
 	{
 		$scaMode = "Enabled"
 	}
-	CONOUT "`nStatus: $scaMode"
+	CONOUT "`n狀態: $scaMode"
 	CONOUT "`r"
 	$tokenFiles = $null
 	$tokenPath = "${env:LOCALAPPDATA}\Microsoft\Office\16.0\Licensing"
@@ -1007,7 +1007,7 @@ function PrintSharedComputerLicensing
 	}
 	If ($null -Eq $tokenFiles -Or $tokenFiles.Length -Eq 0)
 	{
-		CONOUT "No tokens found."
+		CONOUT "找不到 token。"
 		Return
 	}
 	$tokenFiles | ForEach `
@@ -1043,7 +1043,7 @@ function PrintLicensesInformation
 	}
 	If ($null -Eq $licenseFiles -Or $licenseFiles.Length -Eq 0)
 	{
-		CONOUT "`nNo licenses found."
+		CONOUT "`n找不到授權。"
 		Return
 	}
 	$licenseFiles | ForEach `
@@ -1102,15 +1102,15 @@ function vNextDiagRun
 
 	& $isAll
 	CONOUT "$line2"
-	CONOUT "===                  Office vNext Status                 ==="
+	CONOUT "===                  Office vNext 狀態                  ==="
 	CONOUT "$line2"
-	CONOUT "`n========== Mode per ProductReleaseId =========="
+	CONOUT "`n========== 依 ProductReleaseId 的模式 =========="
 	PrintModePerPridFromRegistry
-	CONOUT "`n========== Shared Computer Licensing =========="
+	CONOUT "`n========== 共用電腦授權 =========="
 	PrintSharedComputerLicensing
-	CONOUT "`n========== vNext licenses ==========="
+	CONOUT "`n========== vNext 授權 ==========="
 	PrintLicensesInformation -Mode "NUL"
-	CONOUT "`n========== Device licenses =========="
+	CONOUT "`n========== 裝置授權 =========="
 	PrintLicensesInformation -Mode "Device"
 	CONOUT "$line3"
 	CONOUT "`r"
@@ -1296,7 +1296,7 @@ function PrintSubscriptionStatus {
 function ClicRun
 {
 	& $isAll
-	CONOUT "Client Licensing Check information:"
+	CONOUT "用戶端授權檢查資訊："
 
 	$null = PrintStateData
 	$null = PrintLastActivationHResult
@@ -1417,7 +1417,7 @@ function ClcRun
 	}
 
 	& $isAll
-	CONOUT "Client Licensing Check information:"
+	CONOUT "用戶端授權檢查資訊："
 
 	CONOUT ("    AppId={0}" -f $winApp)
 	if ($prs.ged) { CONOUT ("    GraceEndDate={0}" -f ([DateTime]::UtcNow.AddMinutes($prs.ged).ToString('yyyy/MM/dd:HH:mm:ss'))) }
@@ -1508,9 +1508,9 @@ if ($OsppHook -NE 0) {
 
 if ($WsppHook -NE 0) {
 	if ($NT6 -And -Not $NT7 -And -Not $Admin) {
-		if ($null -EQ [Diagnostics.Process]::GetProcessesByName("$winsvc")[0].ProcessName) {$WsppHook = 0; CONOUT "`nError: failed to start $winsvc Service.`n"}
+		if ($null -EQ [Diagnostics.Process]::GetProcessesByName("$winsvc")[0].ProcessName) {$WsppHook = 0; CONOUT "`n錯誤：無法啟動 $winsvc 服務。`n"}
 	} else {
-		try {sasv $winsvc -EA 1} catch {$WsppHook = 0; CONOUT "`nError: failed to start $winsvc Service.`n"}
+		try {sasv $winsvc -EA 1} catch {$WsppHook = 0; CONOUT "`n錯誤：無法啟動 $winsvc 服務。`n"}
 	}
 }
 
@@ -1532,7 +1532,7 @@ if ($cW1nd0ws.Count -GT 0)
 elseif ($NT6)
 {
 	echoWindows
-	CONOUT "Error: product key not found.`n"
+	CONOUT "錯誤：找不到產品金鑰。`n"
 }
 
 if ($NT6 -And -Not $NT8) {
@@ -1563,7 +1563,7 @@ if ($hSLC) {
 }
 
 if ($OsppHook -NE 0) {
-	try {sasv $offsvc -EA 1} catch {$OsppHook = 0; CONOUT "`nError: failed to start $offsvc Service.`n"}
+	try {sasv $offsvc -EA 1} catch {$OsppHook = 0; CONOUT "`n錯誤：無法啟動 $offsvc 服務。`n"}
 }
 
 if ($OsppHook -NE 0) {

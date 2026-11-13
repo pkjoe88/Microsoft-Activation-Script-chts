@@ -80,10 +80,10 @@ set "selfgit=ht%blank%tps%blank%://git.acti%blank%vated.win/Micr%blank%osoft-Act
 sc query Null | find /i "RUNNING"
 if %errorlevel% NEQ 0 (
 echo:
-echo Null service is not running, script may crash...
+echo Null 服務未執行，腳本可能會當機...
 echo:
 echo:
-echo Check this webpage for help - %mas%fix_service
+echo 請查看此網頁尋求協助 - %mas%fix_service
 echo:
 echo:
 ping 127.0.0.1 -n 20
@@ -94,10 +94,10 @@ cls
 
 >nul findstr /v "$" "%_cmdf%" && (
 echo:
-echo Error - Script either has LF line ending issue or an empty line at the end of the script is missing.
+echo 錯誤 - 腳本的換行格式有 LF 問題，或腳本結尾缺少一行空行。
 echo:
 echo:
-echo Check this webpage for help - %mas%troubleshoot
+echo 請查看此網頁尋求協助 - %mas%troubleshoot
 echo:
 echo:
 ping 127.0.0.1 -n 20 >nul
@@ -108,7 +108,7 @@ exit /b
 
 cls
 color 07
-title  Troubleshoot %masver%
+title  疑難排解 %masver%
 
 set _args=
 set _elev=
@@ -136,19 +136,19 @@ set "line=______________________________________________________________________
 
 if %winbuild% EQU 1 (
 %eline%
-echo Failed to detect Windows build number.
+echo 無法偵測 Windows 組建編號。
 echo:
 setlocal EnableDelayedExpansion
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
 if exist "%Systemdrive%\Users\WDAGUtilityAccount" (
 sc query gcs | find /i "RUNNING" %nul% && (
 %eline%
-echo Windows Sandbox detected.
-echo The script cannot run due to missing licensing components. Aborting...
+echo 偵測到 Windows Sandbox。
+echo 系統缺少授權元件，腳本無法執行。正在中止...
 echo:
 goto dk_done
 )
@@ -156,12 +156,12 @@ goto dk_done
 
 if %winbuild% LSS 6001 (
 %nceline%
-echo Unsupported OS version detected [%winbuild%].
-echo MAS only supports Windows Vista/7/8/8.1/10/11 and their Server equivalents.
+echo 偵測到不支援的作業系統版本 [%winbuild%]。
+echo MAS 僅支援 Windows Vista/7/8/8.1/10/11 與對應的 Server 版本。
 if %winbuild% EQU 6000 (
 echo:
-echo Windows Vista RTM is not supported because Powershell cannot be installed.
-echo Upgrade to Windows Vista SP1 or SP2.
+echo 不支援 Windows Vista RTM，因為無法安裝 PowerShell。
+echo 請升級至 Windows Vista SP1 或 SP2。
 )
 goto dk_done
 )
@@ -169,9 +169,9 @@ goto dk_done
 if %winbuild% LSS 7600 if not exist "%SysPath%\WindowsPowerShell\v1.0\Modules" (
 %nceline%
 if not exist %ps% (
-echo PowerShell is not installed in your system.
+echo 系統未安裝 PowerShell。
 )
-echo Install PowerShell 2.0 using the following URL.
+echo 請從下列網址安裝 PowerShell 2.0。
 echo:
 echo https://www.catalog.update.microsoft.com/Search.aspx?q=KB968930
 if %_unattended%==0 start https://www.catalog.update.microsoft.com/Search.aspx?q=KB968930
@@ -199,10 +199,10 @@ setlocal EnableDelayedExpansion
 echo "!_cmdf!" | find /i "!_ttemp!" %nul1% && (
 if /i not "!_work!"=="!_ttemp!" (
 %eline%
-echo The script was launched from the temp folder.
-echo You are most likely running the script directly from the archive file.
+echo 腳本是從暫存資料夾啟動的。
+echo 您很可能是直接在壓縮檔內執行腳本。
 echo:
-echo Extract the archive file and launch the script from the extracted folder.
+echo 請先解壓縮檔案，再從解壓後的資料夾啟動腳本。
 goto dk_done
 )
 )
@@ -214,8 +214,8 @@ goto dk_done
 %nul1% fltmc || (
 if not defined _elev %psc% "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
 %eline%
-echo This script needs admin rights.
-echo Right click on this script and select 'Run as administrator'.
+echo 此腳本需要系統管理員權限。
+echo 請以滑鼠右鍵按一下此腳本，然後選擇「以系統管理員身分執行」。
 goto dk_done
 )
 
@@ -225,31 +225,31 @@ goto dk_done
 
 ::pstst $ExecutionContext.SessionState.LanguageMode :pstst
 
-for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!') -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
+for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
 
 if /i not "%tstresult%"=="FullLanguage" (
 %eline%
 for /f "delims=" %%a in ('%psc% "$ExecutionContext.SessionState.LanguageMode" %nul6%') do (set tstresult2=%%a)
-echo Test 1 - %tstresult%
-echo Test 2 - !tstresult2!
+echo 測試 1 - %tstresult%
+echo 測試 2 - !tstresult2!
 echo:
 
 REM check LanguageMode
 
 echo: !tstresult2! | findstr /i "ConstrainedLanguage RestrictedLanguage NoLanguage" %nul1% && (
-echo FullLanguage mode not found in PowerShell. Aborting...
-echo If you have applied restrictions on Powershell then undo those changes.
+echo PowerShell 未處於 FullLanguage 模式。正在中止...
+echo 如果您曾對 PowerShell 套用限制，請先復原那些變更。
 set fixes=%fixes% %mas%fix_powershell
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%fix_powershell"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%fix_powershell"
 goto dk_done
 )
 
 REM check Powershell core version
 
 cmd /c "%psc% "$PSVersionTable.PSEdition"" | find /i "Core" %nul1% && (
-echo Windows Powershell is needed for MAS but it seems to be replaced with Powershell core. Aborting...
+echo MAS 需要 Windows PowerShell，但系統中的 PowerShell 似乎已被 PowerShell Core 取代。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 
@@ -257,9 +257,9 @@ REM check for Mal-ware that may cause issues with Powershell
 
 for /r "%ProgramFiles%\" %%f in (secureboot.exe) do if exist "%%f" (
 echo "%%f"
-echo Mal%blank%ware found, PowerShell is not working properly.
+echo 偵測到惡意軟體，PowerShell 無法正常運作。
 set fixes=%fixes% %mas%remove_mal%w%ware
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%remove_mal%w%ware"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%remove_mal%w%ware"
 goto dk_done
 )
 
@@ -268,29 +268,29 @@ REM check if .NET is working properly
 if /i "!tstresult2!"=="FullLanguage" (
 cmd /c "%psc% ""try {[System.AppDomain]::CurrentDomain.GetAssemblies(); [System.Math]::Sqrt(144)} catch {Exit 3}""" %nul%
 if !errorlevel!==3 (
-echo Windows Powershell failed to load .NET command. Aborting...
+echo Windows PowerShell 無法載入 .NET 命令。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 )
 
 REM check antivirus and other errors
 
-echo PowerShell is not working properly. Aborting...
+echo PowerShell 無法正常運作。正在中止...
 
 if /i "!tstresult2!"=="FullLanguage" (
 echo:
-echo Your antivirus software might be blocking the script.
+echo 您的防毒軟體可能封鎖了此腳本。
 echo:
 sc query sense | find /i "RUNNING" %nul% && (
-echo Installed Antivirus - Microsoft Defender for Endpoint
+echo 已安裝的防毒軟體 - Microsoft Defender for Endpoint
 )
 cmd /c "%psc% ""$av = Get-WmiObject -Namespace root\SecurityCenter2 -Class AntiVirusProduct; $n = @(); foreach ($i in $av) { $n += $i.displayName }; if ($n) { Write-Host ('Installed Antivirus - ' + ($n -join ', '))}"""
 )
 
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
@@ -361,14 +361,14 @@ if not "%%C"=="" set old=
 if defined old (
 echo ________________________________________________
 %eline%
-echo Your version of MAS [%masver%] is outdated.
+echo 您的 MAS 版本 [%masver%] 已過期。
 echo ________________________________________________
 echo:
 if not %_unattended%==1 (
-echo [1] Get Latest MAS
-echo [0] Continue Anyway
+echo [1] 取得最新版 MAS
+echo [0] 仍要繼續
 echo:
-call :dk_color %_Green% "Choose a menu option using your keyboard [1,0] :"
+call :dk_color %_Green% "請以鍵盤選擇選單選項 [1,0]："
 choice /C:10 /N
 if !errorlevel!==2 rem
 if !errorlevel!==1 (start %selfgit% & start %github% & start %mas% & exit /b)
@@ -387,7 +387,7 @@ if not defined desktop for /f "delims=" %%a in ('%psc% "& {write-host $([Environ
 
 if not defined desktop (
 %eline%
-echo Unable to detect Desktop location, aborting...
+echo 無法偵測桌面位置，正在中止...
 goto dk_done
 )
 
@@ -399,7 +399,7 @@ setlocal EnableDelayedExpansion
 
 cls
 color 07
-title  Troubleshoot %masver%
+title  疑難排解 %masver%
 if not defined terminal mode 77, 30
 
 echo:
@@ -408,21 +408,21 @@ echo:
 echo:
 echo:       _______________________________________________________________
 echo:                                                   
-call :dk_color2 %_White% "             [1] " %_Green% "Help"
+call :dk_color2 %_White% "             [1] " %_Green% "說明"
 echo:             ___________________________________________________
 echo:                                                                      
 echo:             [2] Dism RestoreHealth
 echo:             [3] SFC Scannow
 echo:                                                                      
-echo:             [4] Fix WMI
-echo:             [5] Fix Licensing
-echo:             [6] Fix WPA Registry
+echo:             [4] 修復 WMI
+echo:             [5] 修復授權
+echo:             [6] 修復 WPA 登錄檔
 echo:             ___________________________________________________
 echo:
 echo:             [0] %_exitmsg%
 echo:       _______________________________________________________________
 echo:          
-call :dk_color2 %_White% "            " %_Green% "Choose a menu option using your keyboard :"
+call :dk_color2 %_White% "            " %_Green% "請以鍵盤選擇選單選項："
 choice /C:1234560 /N
 set _erl=%errorlevel%
 
@@ -445,8 +445,8 @@ title  Dism /English /Online /Cleanup-Image /RestoreHealth
 
 if %winbuild% LSS 9200 (
 %eline%
-echo Unsupported OS version detected.
-echo This command only works on Windows 8/8.1/10/11 and their Server equivalents.
+echo 偵測到不支援的作業系統版本。
+echo 此命令僅適用於 Windows 8/8.1/10/11 與對應的 Server 版本。
 goto :at_back
 )
 
@@ -457,25 +457,25 @@ for /f "delims=[] tokens=2" %%# in ('ping -n 1 %%a') do (if not "%%#"=="" set _i
 
 echo:
 if defined _int (
-echo      Checking Internet Connection  [Connected]
+echo      正在檢查網際網路連線  [已連線]
 ) else (
-call :dk_color2 %_White% "     " %Red% "Checking Internet Connection  [Not connected]"
+call :dk_color2 %_White% "     " %Red% "正在檢查網際網路連線  [未連線]"
 )
 
 echo %line%
 echo:
-echo      DISM uses Windows Update to provide replacement files required to fix corruption.
-echo      This will take 5-15 minutes or more..
+echo      DISM 會使用 Windows Update 提供修復損毀所需的取代檔案。
+echo      這需要 5-15 分鐘或更久..
 echo %line%
 echo:
-echo      Notes:
+echo      注意事項：
 echo:
-call :dk_color2 %_White% "     - " %Gray% "Make sure the internet is connected."
-call :dk_color2 %_White% "     - " %Gray% "Make sure that Windows update is properly working."
+call :dk_color2 %_White% "     - " %Gray% "請確認已連上網際網路。"
+call :dk_color2 %_White% "     - " %Gray% "請確認 Windows Update 正常運作。"
 echo:
 echo %line%
 echo:
-choice /C:09 /N /M ">    [9] Continue [0] Go back : "
+choice /C:09 /N /M ">    [9] 繼續 [0] 返回 : "
 if %errorlevel%==1 goto at_menu
 
 cls
@@ -491,7 +491,7 @@ del /f /q "%SystemRoot%\logs\cbs\cbs.log" %nul%
 del /f /q "%SystemRoot%\logs\DISM\dism.log" %nul%
 
 echo:
-echo Applying the command...
+echo 正在套用命令...
 echo dism /english /online /cleanup-image /restorehealth
 dism /english /online /cleanup-image /restorehealth
 
@@ -512,7 +512,7 @@ copy /y /b "%SystemRoot%\logs\DISM\dism.log" "!desktop!\AT_Logs\RHealth_DISM_%_t
 )
 
 echo:
-call :dk_color %Gray% "CBS and DISM logs are copied to the AT_Logs folder on your desktop."
+call :dk_color %Gray% "CBS 與 DISM 記錄檔已複製到桌面上的 AT_Logs 資料夾。"
 goto :at_back
 
 ::========================================================================================================================================
@@ -526,17 +526,17 @@ title  sfc /scannow
 echo:
 echo %line%
 echo:    
-echo      SFC will repair missing or corrupted system files.
-echo      It is recommended you run the DISM option first before this one.
-echo      This will take 10-15 minutes or more..
+echo      SFC 會修復遺失或損毀的系統檔案。
+echo      建議您先執行 DISM 選項，再執行這個選項。
+echo      這需要 10-15 分鐘或更久..
 echo:
-echo      If SFC could not fix something, then run the command again to see if it may be able 
-echo      to the next time. Sometimes it may take running the sfc /scannow command 3 times
-echo      restarting the PC after each time to completely fix everything that it's able to.
+echo      如果 SFC 無法修復某些項目，請再次執行命令，看看下次是否能夠修復。
+echo      有時可能需要執行 sfc /scannow 命令 3 次，
+echo      並在每次執行後重新啟動電腦，才能完全修復它所有能修復的項目。
 echo:   
 echo %line%
 echo:
-choice /C:09 /N /M ">    [9] Continue [0] Go back : "
+choice /C:09 /N /M ">    [9] 繼續 [0] 返回 : "
 if %errorlevel%==1 goto at_menu
 
 cls
@@ -548,7 +548,7 @@ copy /y /b "%SystemRoot%\logs\cbs\cbs.log" "%SystemRoot%\logs\cbs\backup_cbs_%_t
 del /f /q "%SystemRoot%\logs\cbs\cbs.log" %nul%
 
 echo:
-echo Applying the command...
+echo 正在套用命令...
 echo sfc /scannow
 sfc /scannow
 
@@ -563,7 +563,7 @@ copy /y /b "%SystemRoot%\logs\cbs\cbs.log" "!desktop!\AT_Logs\SFC_CBS_%_time%.lo
 )
 
 echo:
-call :dk_color %Gray% "The CBS log was copied to the AT_Logs folder on your Desktop."
+call :dk_color %Gray% "CBS 記錄檔已複製到桌面上的 AT_Logs 資料夾。"
 goto :at_back
 
 ::========================================================================================================================================
@@ -575,36 +575,36 @@ if not defined terminal (
 mode 125, 32
 %psc% "&{$W=$Host.UI.RawUI.WindowSize;$B=$Host.UI.RawUI.BufferSize;$W.Height=31;$B.Height=200;$Host.UI.RawUI.WindowSize=$W;$Host.UI.RawUI.BufferSize=$B;}" %nul%
 )
-title  Fix Licensing ^(ClipSVC ^+ SPP ^+ OSPP^)
+title  修復授權 ^(ClipSVC ^+ SPP ^+ OSPP^)
 
 if %winbuild% EQU 6001 (
 %eline%
-echo This option is not supported on Windows Vista SP1.
-echo Upgrade to Windows Vista SP2.
+echo Windows Vista SP1 不支援此選項。
+echo 請升級至 Windows Vista SP2。
 goto :at_back
 )
 
 echo:
 echo %line%
 echo:   
-echo      Notes:
+echo      注意事項：
 echo:
-echo       - This option helps in troubleshooting activation issues.
+echo       - 此選項有助於疑難排解啟用問題。
 echo:
-echo       - This option will:
-echo            - Deactivate Windows and Office, you may need to reactivate.
-echo              If Windows is activated with motherboard / OEM / Digital license
-echo              then Windows will activate itself again.
+echo       - 此選項將會：
+echo            - 停用 Windows 與 Office，您可能需要重新啟用。
+echo              如果 Windows 是以主機板／OEM／數位授權啟用，
+echo              則 Windows 之後會自行重新啟用。
 echo:
-echo            - Clear ClipSVC, SPP and OSPP licenses.
-echo            - Fix permissions of SPP tokens folder and registries.
-echo            - Trigger the repair option for Office.
+echo            - 清除 ClipSVC、SPP 與 OSPP 授權。
+echo            - 修復 SPP token 資料夾與登錄檔的權限。
+echo            - 觸發 Office 的修復選項。
 echo:
-call :dk_color2 %_White% "      - " %Blue% "Apply this option only when it is necessary."
+call :dk_color2 %_White% "      - " %Blue% "僅在必要時套用此選項。"
 echo:
 echo %line%
 echo:
-choice /C:09 /N /M ">    [9] Continue [0] Go back : "
+choice /C:09 /N /M ">    [9] 繼續 [0] 返回 : "
 if %errorlevel%==1 goto at_menu
 
 ::========================================================================================================================================
@@ -617,18 +617,18 @@ cls
 echo:
 echo %line%
 echo:
-call :dk_color %Blue% "Rebuilding ClipSVC Licenses..."
+call :dk_color %Blue% "正在重建 ClipSVC 授權..."
 echo:
 
 if %winbuild% LSS 10240 (
-echo ClipSVC license rebuilding is supported only on Windows 10/11.
-echo Skipping...
+echo 僅支援在 Windows 10/11 上重建 ClipSVC 授權。
+echo 正在略過...
 goto :rebuildspptok
 )
 
 %psc% "(([WMISEARCHER]'SELECT Name FROM SoftwareLicensingProduct WHERE LicenseStatus=1 AND GracePeriodRemaining=0 AND PartialProductKey IS NOT NULL AND LicenseDependsOn is NULL').Get()).Name" %nul2% | findstr /i "Windows" %nul1% && (
-echo Windows is permanently activated.
-echo Skipping...
+echo Windows 已永久啟用。
+echo 正在略過...
 goto :rebuildspptok
 )
 
@@ -638,15 +638,15 @@ for /f "tokens=2 delims==" %%# in ('%psc% "(([WMISEARCHER]'SELECT PartialProduct
 for %%# in (8HV2C QPFCT 3V66T PKCKT WXCHW 8TYMD 6F4BT 8HVX7 KD72Y 7CFBY DRR8H P39PB DYJWX MDWWW 9HKR4 M7V2X 2YV77 WT2RQ MHBPB QPF8P 2YV66 VMJ2C DJ4F6 CKFFD YY74H J8JXD BHDCD T6R4W D32MH RRK69 3PJBP) do if /i "%_partial%"=="%%#" set _keymatch=1
 
 if not defined _keymatch (
-echo HWID activation key is not installed.
-echo Skipping...
+echo 未安裝 HWID 啟用金鑰。
+echo 正在略過...
 goto :rebuildspptok
 )
 
 %psc% "If([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}')).IsConnectedToInternet){Exit 0}Else{Exit 1}"
 if errorlevel 1 (
-echo Internet is not connected.
-echo Skipping...
+echo 網際網路未連線。
+echo 正在略過...
 goto :rebuildspptok
 )
 
@@ -661,28 +661,28 @@ if !errorlevel!==3 set resfail=1
 )
 
 if defined resfail (
-echo Failed to connect to licensing servers.
-echo Skipping...
+echo 無法連線到授權伺服器。
+echo 正在略過...
 goto :rebuildspptok
 )
 
-echo Stopping ClipSVC service...
+echo 正在停止 ClipSVC 服務...
 %psc% Stop-Service ClipSVC -force %nul%
 timeout /t 2 %nul%
 
 echo:
-echo Applying the command to clean ClipSVC Licenses...
+echo 正在套用清除 ClipSVC 授權的命令...
 echo rundll32 clipc.dll,ClipCleanUpState
 
 rundll32 clipc.dll,ClipCleanUpState
 
 if %winbuild% LEQ 10240 (
-echo [Successful]
+echo [成功]
 ) else (
 if exist "%ProgramData%\Microsoft\Windows\ClipSVC\tokens.dat" (
-call :dk_color %Red% "[Failed]"
+call :dk_color %Red% "[失敗]"
 ) else (
-echo [Successful]
+echo [成功]
 )
 )
 
@@ -696,25 +696,25 @@ reg query "%RegKey%" %nul% && %nul% call :regownstart
 reg delete "%RegKey%" /f %nul% 
 
 echo:
-echo Deleting a Volatile ^& Protected Registry Key...
+echo 正在刪除 Volatile 與受保護的登錄檔機碼...
 echo [%RegKey%]
 reg query "%RegKey%" %nul% && (
-call :dk_color %Red% "[Failed]"
-echo Reboot your machine using the restart option, that will delete this registry key automatically.
+call :dk_color %Red% "[失敗]"
+echo 請使用「重新啟動」選項重新開機，系統會自動刪除此登錄檔機碼。
 ) || (
-echo [Successful]
+echo [成功]
 )
 
 ::   Clear HWID token related registry to fix activation incase there is any corruption
 
 echo:
-echo Deleting IdentityCRL Registry Key...
+echo 正在刪除 IdentityCRL 登錄檔機碼...
 echo [%_ident%]
 reg delete "%_ident%" /f %nul%
 reg query "%_ident%" %nul% && (
-call :dk_color %Red% "[Failed]"
+call :dk_color %Red% "[失敗]"
 ) || (
-echo [Successful]
+echo [成功]
 )
 
 %psc% Stop-Service ClipSVC -force %nul%
@@ -723,29 +723,29 @@ echo [Successful]
 
 echo:
 if %winbuild% GTR 10240 (
-echo Deleting folder %ProgramData%\Microsoft\Windows\ClipSVC\
+echo 正在刪除資料夾 %ProgramData%\Microsoft\Windows\ClipSVC\
 rmdir /s /q "C:\ProgramData\Microsoft\Windows\ClipSvc" %nul%
 
 if exist "%ProgramData%\Microsoft\Windows\ClipSVC\" (
-call :dk_color %Red% "[Failed]"
+call :dk_color %Red% "[失敗]"
 ) else (
-echo [Successful]
+echo [成功]
 )
 
 echo:
-echo Rebuilding the %ProgramData%\Microsoft\Windows\ClipSVC\ folder...
+echo 正在重建 %ProgramData%\Microsoft\Windows\ClipSVC\ 資料夾...
 %psc% Start-Service ClipSVC %nul%
 timeout /t 3 %nul%
 if not exist "%ProgramData%\Microsoft\Windows\ClipSVC\" timeout /t 5 %nul%
 if not exist "%ProgramData%\Microsoft\Windows\ClipSVC\" (
-call :dk_color %Red% "[Failed]"
+call :dk_color %Red% "[失敗]"
 ) else (
-echo [Successful]
+echo [成功]
 )
 )
 
 echo:
-echo Restarting wlidsvc ^& LicenseManager services...
+echo 正在重新啟動 wlidsvc 與 LicenseManager 服務...
 for %%# in (wlidsvc LicenseManager) do (%psc% "Start-Job { Restart-Service %%# } | Wait-Job -Timeout 20 | Out-Null")
 
 ::========================================================================================================================================
@@ -757,34 +757,34 @@ for %%# in (wlidsvc LicenseManager) do (%psc% "Start-Job { Restart-Service %%# }
 echo:
 echo %line%
 echo:
-call :dk_color %Blue% "Rebuilding SPP licensing tokens..."
+call :dk_color %Blue% "正在重建 SPP 授權 token..."
 echo:
 
-echo Clearing KMS Cache...
+echo 正在清除 KMS 快取...
 echo:
 call :_taskclear-cache
 
 %nul% reg query "HKLM\%SPPk%\%_wApp%" && (
-echo Removing KMS38 protection...
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':regdel\:.*';. ([scriptblock]::Create($f[1]))"
+echo 正在移除 KMS38 保護...
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':regdel\:.*';. ([scriptblock]::Create($f[1]))"
 %nul% reg delete "HKLM\%SPPk%\%_wApp%" /f
 %nul% reg query "HKLM\%SPPk%\%_wApp%" && (
-call :dk_color %Red% "Failed to remove KMS38 protection."
+call :dk_color %Red% "移除 KMS38 保護失敗。"
 ) || (
-echo Successfully removed KMS38 protection.
-echo Successfully cleared KMS Cache.
+echo 已成功移除 KMS38 保護。
+echo 已成功清除 KMS 快取。
 )
 ) || (
-echo Successfully cleared KMS Cache.
+echo 已成功清除 KMS 快取。
 )
 echo:
 
 call :scandat check
 
 if not defined token (
-call :dk_color %Red% "tokens.dat file not found."
+call :dk_color %Red% "找不到 tokens.dat 檔案。"
 ) else (
-echo tokens.dat file: [%token%]
+echo tokens.dat 檔案: [%token%]
 )
 
 set tokenstore=
@@ -793,31 +793,31 @@ for /f "skip=2 tokens=2*" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT
 if %winbuild% GEQ 9200 if /i not "%tokenstore%"=="%SysPath%\spp\store" if /i not "%tokenstore%"=="%SysPath%\spp\store\2.0" if /i not "%tokenstore%"=="%SysPath%\spp\store_test\2.0" (
 set badregistry=1
 echo:
-call :dk_color %Red% "Correct path not found in TokenStore Registry [%tokenstore%]"
+call :dk_color %Red% "在 TokenStore 登錄檔中找不到正確路徑 [%tokenstore%]"
 )
 
 ::  Check sppsvc permissions and apply fixes
 
 if %winbuild% GEQ 9200 if not defined badregistry (
 echo:
-echo Checking SPP permission related issues...
+echo 正在檢查 SPP 權限相關問題...
 call :checkperms
 if defined permerror (
 call :dk_color %Red% "[!permerror!]"
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':fixsppperms\:.*';. ([scriptblock]::Create($f[1]))" %nul%
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':fixsppperms\:.*';. ([scriptblock]::Create($f[1]))" %nul%
 call :checkperms
 if defined permerror (
-call :dk_color %Red% "[!permerror!] [Failed To Fix]"
+call :dk_color %Red% "[!permerror!] [修復失敗]"
 ) else (
-call :dk_color %Green% "[Successfully Fixed]"
+call :dk_color %Green% "[已成功修復]"
 )
 ) else (
-echo [No Error Found]
+echo [未發現錯誤]
 )
 )
 
 echo:
-echo Stopping %_slser% service...
+echo 正在停止 %_slser% 服務...
 %psc% Stop-Service %_slser% -force %nul%
 
 set w=
@@ -825,7 +825,7 @@ set _sppint=
 for %%# in (SppEx%w%tComObj.exe %_slexe%) do (reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Ima%w%ge File Execu%w%tion Options\%%#" %nul% && (set _sppint=1))
 if defined _sppint (
 echo:
-echo Removing SPP IFEO registry keys...
+echo 正在移除 SPP IFEO 登錄檔機碼...
 for %%# in (SppE%w%xtComObj.exe %_slexe%) do (reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Ima%w%ge File Execu%w%tion Options\%%#" /f %nul%)
 )
 
@@ -833,13 +833,13 @@ if %winbuild% LSS 9200 if not defined _vis (
 REM Fix issues caused by Update KB971033 in Windows 7
 REM https://support.microsoft.com/en-us/help/4487266
 echo:
-echo Checking Update KB971033...
+echo 正在檢查更新 KB971033...
 %psc% "if (Get-Hotfix -Id KB971033 -ErrorAction SilentlyContinue) {Exit 3}" %nul%
 if !errorlevel!==3 (
-echo Found, uninstalling it...
+echo 已找到，正在解除安裝...
 wusa /uninstall /quiet /norestart /kb:971033
 ) else (
-echo [Not Found]
+echo [找不到]
 )
 %psc% Stop-Service sppuinotify -force %nul%
 sc config sppuinotify start= disabled
@@ -850,7 +850,7 @@ del /f /q %SysPath%\7B296FB0-376B-497e-B012-9C450E1B7327-*.C7483456-A289-439d-81
 
 if not defined _vis (
 echo:
-echo Cleaning some licensing-related registry keys...
+echo 正在清理部分授權相關的登錄檔機碼...
 %nul% reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform" /v "ServiceSessionId" /f
 %nul% reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform" /v "LicStatusArray" /f
 %nul% reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform" /v "PolicyValuesArray" /f
@@ -864,7 +864,7 @@ call :scandat check
 
 if defined token (
 echo:
-call :dk_color %Red% "Failed to delete .dat files."
+call :dk_color %Red% "刪除 .dat 檔案失敗。"
 echo:
 )
 
@@ -873,22 +873,22 @@ if defined _vis (
 )
 
 echo:
-echo Reinstalling system licenses...
-%psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
-if %errorlevel% NEQ 0 %psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!') -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
+echo 正在重新安裝系統授權...
+%psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
+if %errorlevel% NEQ 0 %psc% "$sls = Get-WmiObject SoftwareLicensingService; $f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':xrm\:.*';. ([scriptblock]::Create($f[1])); ReinstallLicenses" %nul%
 if %errorlevel% EQU 0 (
-echo [Successful]
+echo [成功]
 ) else (
-call :dk_color %Red% "[Failed]"
+call :dk_color %Red% "[失敗]"
 )
 
 call :scandat check
 
 echo:
 if not defined token (
-call :dk_color %Red% "Failed to rebuild tokens.dat file."
+call :dk_color %Red% "重建 tokens.dat 檔案失敗。"
 ) else (
-echo tokens.dat file was rebuilt successfully.
+echo tokens.dat 檔案已成功重建。
 )
 
 if %winbuild% LSS 9200 if not defined _vis (
@@ -902,25 +902,25 @@ sc config sppuinotify start= demand
 echo:
 echo %line%
 echo:
-call :dk_color %Blue% "Rebuilding OSPP licensing tokens..."
+call :dk_color %Blue% "正在重建 OSPP 授權 token..."
 echo:
 
 sc qc osppsvc %nul% || (
-echo OSPP-based Office is not installed.
-echo Skipping rebuilding OSPP tokens...
+echo 未安裝以 OSPP 為基礎的 Office。
+echo 正在略過重建 OSPP token...
 goto :repairoffice
 )
 
 call :scandatospp check
 
 if not defined token (
-call :dk_color %Red% "tokens.dat file not found."
+call :dk_color %Red% "找不到 tokens.dat 檔案。"
 ) else (
-echo tokens.dat file: [%token%]
+echo tokens.dat 檔案: [%token%]
 )
 
 echo:
-echo Stopping osppsvc service...
+echo 正在停止 osppsvc 服務...
 %psc% Stop-Service osppsvc -force %nul%
 
 echo:
@@ -929,12 +929,12 @@ call :scandatospp check
 
 if defined token (
 echo:
-call :dk_color %Red% "Failed to delete .dat files."
+call :dk_color %Red% "刪除 .dat 檔案失敗。"
 echo:
 )
 
 echo:
-echo Starting osppsvc service to generate tokens.dat...
+echo 正在啟動 osppsvc 服務以產生 tokens.dat...
 %psc% Start-Service osppsvc %nul%
 call :scandatospp check
 if not defined token (
@@ -947,9 +947,9 @@ call :scandatospp check
 
 echo:
 if not defined token (
-call :dk_color %Red% "Failed to rebuild tokens.dat file."
+call :dk_color %Red% "重建 tokens.dat 檔案失敗。"
 ) else (
-echo tokens.dat file was rebuilt successfully.
+echo tokens.dat 檔案已成功重建。
 )
 
 ::========================================================================================================================================
@@ -959,7 +959,7 @@ echo tokens.dat file was rebuilt successfully.
 echo:
 echo %line%
 echo:
-call :dk_color %Blue% "Repairing Office licenses..."
+call :dk_color %Blue% "正在修復 Office 授權..."
 echo:
 
 for %%# in (68 86) do (
@@ -990,7 +990,7 @@ if %winbuild% GEQ 10240 (
 )
 
 set /a counter=0
-echo Checking installed Office versions...
+echo 正在檢查已安裝的 Office 版本...
 echo:
 
 for %%# in (
@@ -1018,30 +1018,30 @@ set /a counter+=1
 
 if %counter% GTR 1 (
 %eline%
-echo Multiple Office versions found.
-echo It is recommended to only install one version of Office.
+echo 發現多個 Office 版本。
+echo 建議只安裝一個版本的 Office。
 echo ________________________________________________________________
 echo:
 )
 
 echo:
 if %counter% EQU 0 (
-echo Office ^(2010 and later^) is not installed.
+echo 未安裝 Office（2010 及更新版本）。
 goto :repairend
 ) else if not defined c2r16_68 if not defined c2r16_86 (
-call :dk_color %_Yellow% "A new window will appear, in that window you need to select [Quick Repair] option."
+call :dk_color %_Yellow% "將會出現一個新視窗，請在該視窗中選擇 [快速修復] 選項。"
 if defined terminal (
-call :dk_color %_Yellow% "Press [0] to continue..."
+call :dk_color %_Yellow% "按 [0] 繼續..."
 choice /c 0 /n
 ) else (
-call :dk_color %_Yellow% "Press any key to continue..."
+call :dk_color %_Yellow% "按任意鍵繼續..."
 pause %nul1%
 )
 )
 
 if defined uwp16 (
 echo:
-echo Skipping repair for Office 16.0 UWP... 
+echo 正在略過修復 Office 16.0 UWP...
 echo:
 )
 
@@ -1051,7 +1051,7 @@ if defined c2r14_86 set c2r14=1
 
 if defined c2r14 (
 echo:
-echo Skipping repair for Office 14.0 C2R...
+echo 正在略過修復 Office 14.0 C2R...
 echo:
 )
 
@@ -1072,7 +1072,7 @@ echo:
 echo %line%
 echo:
 echo:
-call :dk_color %Green% "Finished"
+call :dk_color %Green% "已完成"
 goto :at_back
 
 :getc2rrepair
@@ -1106,18 +1106,18 @@ exit /b
 
 cls
 if not defined terminal mode 98, 34
-title  Fix WMI
+title  修復 WMI
 
 ::  https://techcommunity.microsoft.com/t5/ask-the-performance-team/wmi-repository-corruption-or-not/ba-p/375484
 
 if exist "%SystemRoot%\Servicing\Packages\Microsoft-Windows-Server*Edition~*.mum" (
 %eline%
-echo Rebuilding WMI is not recommended on Windows Server, aborting...
+echo 不建議在 Windows Server 上重建 WMI，正在中止...
 goto :at_back
 )
 
 echo:
-echo Checking WMI
+echo 正在檢查 WMI
 call :checkwmi
 
 ::  Apply basic fix first and check
@@ -1129,12 +1129,12 @@ call :checkwmi
 )
 
 if not defined error (
-echo [Working]
-echo No need to apply this option, aborting...
+echo [運作中]
+echo 無需套用此選項，正在中止...
 goto :at_back
 )
 
-call :dk_color %Red% "[Not Responding]"
+call :dk_color %Red% "[沒有回應]"
 
 set _corrupt=
 sc start Winmgmt %nul%
@@ -1145,79 +1145,79 @@ for %%G in (DependOnService Description DisplayName ErrorControl ImagePath Objec
 echo:
 if defined _corrupt (
 %eline%
-echo Winmgmt service is corrupted, aborting...
+echo Winmgmt 服務已損毀，正在中止...
 goto :at_back
 )
 
-echo Disabling Winmgmt service
+echo 正在停用 Winmgmt 服務
 sc config Winmgmt start= disabled %nul%
 if %errorlevel% EQU 0 (
-echo [Successful]
+echo [成功]
 ) else (
-call :dk_color %Red% "[Failed] Aborting..."
+call :dk_color %Red% "[失敗] 正在中止..."
 sc config Winmgmt start= auto %nul%
 goto :at_back
 )
 
 echo:
-echo Stopping Winmgmt service
+echo 正在停止 Winmgmt 服務
 %psc% Stop-Service Winmgmt -force %nul%
 %psc% Stop-Service Winmgmt -force %nul%
 %psc% Stop-Service Winmgmt -force %nul%
 sc query Winmgmt | find /i "STOPPED" %nul% && (
-echo [Successful]
+echo [成功]
 ) || (
-call :dk_color %Red% "[Failed]"
-call :dk_color %Blue% "Its recommended to select [Restart] option and then apply Fix WMI option again."
+call :dk_color %Red% "[失敗]"
+call :dk_color %Blue% "建議選擇 [重新啟動] 選項，然後再次套用修復 WMI 選項。"
 echo %line%
 echo:
-choice /C:21 /N /M "> [1] Restart  [2] Revert Back Changes :"
+choice /C:21 /N /M "> [1] 重新啟動  [2] 還原變更 :"
 if !errorlevel!==1 (sc config Winmgmt start= auto %nul%&goto :at_back)
 echo:
-echo Restarting...
+echo 正在重新啟動...
 shutdown -t 5 -r
 exit
 )
 
 echo:
-echo Deleting WMI repository
+echo 正在刪除 WMI 存放庫
 rmdir /s /q "%SysPath%\wbem\repository\" %nul%
 if exist "%SysPath%\wbem\repository\" (
-call :dk_color %Red% "[Failed]"
+call :dk_color %Red% "[失敗]"
 ) else (
-echo [Successful]
+echo [成功]
 )
 
 echo:
-echo Enabling Winmgmt service
+echo 正在啟用 Winmgmt 服務
 sc config Winmgmt start= auto %nul%
 if %errorlevel% EQU 0 (
-echo [Successful]
+echo [成功]
 ) else (
-call :dk_color %Red% "[Failed]"
+call :dk_color %Red% "[失敗]"
 )
 
 call :checkwmi
 if not defined error (
 echo:
-echo Checking WMI
-call :dk_color %Green% "[Working]"
+echo 正在檢查 WMI
+call :dk_color %Green% "[運作中]"
 goto :at_back
 )
 
 echo:
-echo Registering .dll's and Compiling .mof's, .mfl's
+echo 正在註冊 .dll 並編譯 .mof 與 .mfl
 call :registerobj %nul%
 
 echo:
-echo Checking WMI
+echo 正在檢查 WMI
 call :checkwmi
 if defined error (
-call :dk_color %Red% "[Not Responding]"
+call :dk_color %Red% "[沒有回應]"
 echo:
-echo Run [Dism RestoreHealth] and [SFC Scannow] options and make sure there are no errors.
+echo 請執行 [Dism RestoreHealth] 與 [SFC Scannow] 選項，並確認沒有錯誤。
 ) else (
-call :dk_color %Green% "[Working]"
+call :dk_color %Green% "[運作中]"
 )
 
 goto :at_back
@@ -1266,10 +1266,10 @@ echo:
 echo %line%
 echo:
 if defined terminal (
-call :dk_color %_Yellow% "Press [0] key to %_exitmsg%..."
+call :dk_color %_Yellow% "按 [0] 鍵以%_exitmsg%..."
 choice /c 0 /n
 ) else (
-call :dk_color %_Yellow% "Press any key to %_exitmsg%..."
+call :dk_color %_Yellow% "按任意鍵以%_exitmsg%..."
 pause %nul1%
 )
 goto :at_menu
@@ -1578,7 +1578,7 @@ exit /b
 
 :regownstart
 
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':regown\:.*';. ([scriptblock]::Create($f[1]));"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':regown\:.*';. ([scriptblock]::Create($f[1]));"
 exit /b
 
 ::  Below code takes ownership of a volatile registry key and deletes it
@@ -1670,18 +1670,18 @@ echo:
 if %_unattended%==1 timeout /t 2 & exit /b
 
 if defined fixes (
-call :dk_color %White% "Follow ALL the ABOVE blue lines.   "
-call :dk_color2 %Blue% "Press [1] to Open Support Webpage " %Gray% " Press [0] to Go Back"
+call :dk_color %White% "請遵循上方所有藍色文字的指示。   "
+call :dk_color2 %Blue% "按 [1] 開啟支援網頁 " %Gray% " 按 [0] 返回"
 choice /C:10 /N
 if !errorlevel!==2 exit /b
 if !errorlevel!==1 (start %selfgit% & start %github% & for %%# in (%fixes%) do (start %%#))
 )
 
 if defined terminal (
-call :dk_color %_Yellow% "Press [0] key to %_exitmsg%..."
+call :dk_color %_Yellow% "按 [0] 鍵以%_exitmsg%..."
 choice /c 0 /n
 ) else (
-call :dk_color %_Yellow% "Press any key to %_exitmsg%..."
+call :dk_color %_Yellow% "按任意鍵以%_exitmsg%..."
 pause %nul1%
 )
 
@@ -1735,11 +1735,11 @@ set "_Yellow="Black" "Yellow""
 set "nceline=echo: &echo ==== ERROR ==== &echo:"
 set "eline=echo: &call :dk_color %Red% "==== ERROR ====" &echo:"
 if %~z0 GEQ 200000 (
-set "_exitmsg=Go back"
-set "_fixmsg=Go back to Main Menu, select Troubleshoot and run Fix Licensing option."
+set "_exitmsg=返回"
+set "_fixmsg=請回到主選單，選擇疑難排解，然後執行修復授權選項。"
 ) else (
-set "_exitmsg=Exit"
-set "_fixmsg=In MAS folder, run Troubleshoot script and select Fix Licensing option."
+set "_exitmsg=離開"
+set "_fixmsg=請在 MAS 資料夾執行疑難排解腳本，並選擇修復授權選項。"
 )
 exit /b
 

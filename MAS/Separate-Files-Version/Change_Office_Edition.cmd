@@ -68,10 +68,10 @@ set "selfgit=ht%blank%tps%blank%://git.acti%blank%vated.win/Micr%blank%osoft-Act
 sc query Null | find /i "RUNNING"
 if %errorlevel% NEQ 0 (
 echo:
-echo Null service is not running, script may crash...
+echo Null 服務未執行，腳本可能會當機...
 echo:
 echo:
-echo Check this webpage for help - %mas%fix_service
+echo 請查看此網頁尋求協助 - %mas%fix_service
 echo:
 echo:
 ping 127.0.0.1 -n 20
@@ -83,10 +83,10 @@ cls
 pushd "%~dp0"
 >nul findstr /v "$" "%~nx0" && (
 echo:
-echo Error - Script either has LF line ending issue or an empty line at the end of the script is missing.
+echo 錯誤 - 腳本的換行格式有 LF 問題，或腳本結尾缺少一行空行。
 echo:
 echo:
-echo Check this webpage for help - %mas%troubleshoot
+echo 請查看此網頁尋求協助 - %mas%troubleshoot
 echo:
 echo:
 ping 127.0.0.1 -n 20 >nul
@@ -99,7 +99,7 @@ popd
 
 cls
 color 07
-title  Change Office Edition %masver%
+title  變更 Office 版本 %masver%
 
 set _args=
 set _elev=
@@ -127,19 +127,19 @@ set "line=echo _________________________________________________________________
 
 if %winbuild% EQU 1 (
 %eline%
-echo Failed to detect Windows build number.
+echo 無法偵測 Windows 組建編號。
 echo:
 setlocal EnableDelayedExpansion
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
 if exist "%Systemdrive%\Users\WDAGUtilityAccount" (
 sc query gcs | find /i "RUNNING" %nul% && (
 %eline%
-echo Windows Sandbox detected.
-echo The script cannot run due to missing licensing components. Aborting...
+echo 偵測到 Windows Sandbox。
+echo 系統缺少授權元件，腳本無法執行。正在中止...
 echo:
 goto dk_done
 )
@@ -147,8 +147,8 @@ goto dk_done
 
 if %winbuild% LSS 7600 (
 %eline%
-echo Unsupported OS version detected [%winbuild%].
-echo This option is supported only for Windows 7/8/8.1/10/11 and their Server equivalents.
+echo 偵測到不支援的作業系統版本 [%winbuild%]。
+echo 此選項僅支援 Windows 7/8/8.1/10/11 與對應的 Server 版本。
 goto dk_done
 )
 
@@ -174,10 +174,10 @@ setlocal EnableDelayedExpansion
 echo "!_batf!" | find /i "!_ttemp!" %nul1% && (
 if /i not "!_work!"=="!_ttemp!" (
 %eline%
-echo The script was launched from the temp folder.
-echo You are most likely running the script directly from the archive file.
+echo 腳本是從暫存資料夾啟動的。
+echo 您很可能是直接在壓縮檔內執行腳本。
 echo:
-echo Extract the archive file and launch the script from the extracted folder.
+echo 請先解壓縮檔案，再從解壓後的資料夾啟動腳本。
 goto dk_done
 )
 )
@@ -189,8 +189,8 @@ goto dk_done
 %nul1% fltmc || (
 if not defined _elev %psc% "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
 %eline%
-echo This script needs admin rights.
-echo Right click on this script and select 'Run as administrator'.
+echo 此腳本需要系統管理員權限。
+echo 請以滑鼠右鍵按一下此腳本，然後選擇「以系統管理員身分執行」。
 goto dk_done
 )
 
@@ -200,31 +200,31 @@ goto dk_done
 
 ::pstst $ExecutionContext.SessionState.LanguageMode :pstst
 
-for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!') -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
+for /f "delims=" %%a in ('%psc% "if ($PSVersionTable.PSEdition -ne 'Core') {$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':pstst';. ([scriptblock]::Create($f[1]))}" %nul6%') do (set tstresult=%%a)
 
 if /i not "%tstresult%"=="FullLanguage" (
 %eline%
 for /f "delims=" %%a in ('%psc% "$ExecutionContext.SessionState.LanguageMode" %nul6%') do (set tstresult2=%%a)
-echo Test 1 - %tstresult%
-echo Test 2 - !tstresult2!
+echo 測試 1 - %tstresult%
+echo 測試 2 - !tstresult2!
 echo:
 
 REM check LanguageMode
 
 echo: !tstresult2! | findstr /i "ConstrainedLanguage RestrictedLanguage NoLanguage" %nul1% && (
-echo FullLanguage mode not found in PowerShell. Aborting...
-echo If you have applied restrictions on Powershell then undo those changes.
+echo PowerShell 未處於 FullLanguage 模式。正在中止...
+echo 如果您曾對 PowerShell 套用限制，請先復原那些變更。
 set fixes=%fixes% %mas%fix_powershell
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%fix_powershell"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%fix_powershell"
 goto dk_done
 )
 
 REM check Powershell core version
 
 cmd /c "%psc% "$PSVersionTable.PSEdition"" | find /i "Core" %nul1% && (
-echo Windows Powershell is needed for MAS but it seems to be replaced with Powershell core. Aborting...
+echo MAS 需要 Windows PowerShell，但系統中的 PowerShell 似乎已被 PowerShell Core 取代。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 
@@ -232,9 +232,9 @@ REM check for Mal-ware that may cause issues with Powershell
 
 for /r "%ProgramFiles%\" %%f in (secureboot.exe) do if exist "%%f" (
 echo "%%f"
-echo Mal%blank%ware found, PowerShell is not working properly.
+echo 偵測到惡意軟體，PowerShell 無法正常運作。
 set fixes=%fixes% %mas%remove_mal%w%ware
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%remove_mal%w%ware"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%remove_mal%w%ware"
 goto dk_done
 )
 
@@ -243,29 +243,29 @@ REM check if .NET is working properly
 if /i "!tstresult2!"=="FullLanguage" (
 cmd /c "%psc% ""try {[System.AppDomain]::CurrentDomain.GetAssemblies(); [System.Math]::Sqrt(144)} catch {Exit 3}""" %nul%
 if !errorlevel!==3 (
-echo Windows Powershell failed to load .NET command. Aborting...
+echo Windows PowerShell 無法載入 .NET 命令。正在中止...
 set fixes=%fixes% %mas%in-place_repair_upgrade
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%in-place_repair_upgrade"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%in-place_repair_upgrade"
 goto dk_done
 )
 )
 
 REM check antivirus and other errors
 
-echo PowerShell is not working properly. Aborting...
+echo PowerShell 無法正常運作。正在中止...
 
 if /i "!tstresult2!"=="FullLanguage" (
 echo:
-echo Your antivirus software might be blocking the script.
+echo 您的防毒軟體可能封鎖了此腳本。
 echo:
 sc query sense | find /i "RUNNING" %nul% && (
-echo Installed Antivirus - Microsoft Defender for Endpoint
+echo 已安裝的防毒軟體 - Microsoft Defender for Endpoint
 )
 cmd /c "%psc% ""$av = Get-WmiObject -Namespace root\SecurityCenter2 -Class AntiVirusProduct; $n = @(); foreach ($i in $av) { $n += $i.displayName }; if ($n) { Write-Host ('Installed Antivirus - ' + ($n -join ', '))}"""
 )
 
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
@@ -336,14 +336,14 @@ if not "%%C"=="" set old=
 if defined old (
 echo ________________________________________________
 %eline%
-echo Your version of MAS [%masver%] is outdated.
+echo 您的 MAS 版本 [%masver%] 已過期。
 echo ________________________________________________
 echo:
 if not %_unattended%==1 (
-echo [1] Get Latest MAS
-echo [0] Continue Anyway
+echo [1] 取得最新版 MAS
+echo [0] 仍要繼續
 echo:
-call :dk_color %_Green% "Choose a menu option using your keyboard [1,0] :"
+call :dk_color %_Green% "請以鍵盤選擇選單選項 [1,0]："
 choice /C:10 /N
 if !errorlevel!==2 rem
 if !errorlevel!==1 (start %selfgit% & start %github% & start %mas% & exit /b)
@@ -354,10 +354,10 @@ if !errorlevel!==1 (start %selfgit% & start %github% & start %mas% & exit /b)
 
 cls
 if not defined terminal mode 98, 30
-title  Change Office Edition %masver%
+title  變更 Office 版本 %masver%
 
 echo:
-echo Initializing...
+echo 正在初始化...
 echo:
 
 ::========================================================================================================================================
@@ -391,8 +391,8 @@ if %_wmic% EQU 0 set "chkedi=for /f "tokens=2 delims==" %%a in ('%psc% "(([WMISE
 
 if %osedition%==0 (
 %eline%
-echo Failed to detect OS Edition. Aborting...
-call :dk_color %Blue% "To fix this issue, activate Windows from the main menu."
+echo 無法偵測作業系統版本。正在中止...
+call :dk_color %Blue% "若要修復此問題，請從主選單啟用 Windows。"
 goto dk_done
 )
 
@@ -409,8 +409,8 @@ for /f "skip=2 tokens=2*" %%a in ('"reg query %_68%\ClickToRun /v InstallPath" %
 
 if not defined o16c2r_reg (
 %eline%
-echo Office C2R 2016 or later is not installed, which is required for this script.
-echo Download and install Office from below URL and try again.
+echo 未安裝 Office C2R 2016 或更新版本，而此腳本需要它。
+echo 請從下方網址下載並安裝 Office，然後再試一次。
 set fixes=%fixes% %mas%genuine-installation-media
 call :dk_color %_Yellow% "%mas%genuine-installation-media"
 goto dk_done
@@ -424,10 +424,10 @@ call :ch_getinfo
 
 if %verchk% LSS 9029 (
 %eline%
-echo Installed Office version is %_version%.
-echo Minimum required version is 16.0.9029.2167
-echo Aborting...
-call :dk_color %Blue% "Download and install latest Office from below URL and try again."
+echo 已安裝的 Office 版本為 %_version%。
+echo 最低需求版本為 16.0.9029.2167
+echo 正在中止...
+call :dk_color %Blue% "請從下方網址下載並安裝最新版 Office，然後再試一次。"
 set fixes=%fixes% %mas%genuine-installation-media
 call :dk_color %_Yellow% "%mas%genuine-installation-media"
 goto dk_done
@@ -448,7 +448,7 @@ _masterxml
 ) do (
 if not defined %%A (
 %eline%
-echo Failed to find %%A. Aborting...
+echo 找不到 %%A。正在中止...
 call :dk_color %Blue% "Download and install Office from below URL and try again."
 set fixes=%fixes% %mas%genuine-installation-media
 call :dk_color %_Yellow% "%mas%genuine-installation-media"
@@ -458,11 +458,11 @@ goto dk_done
 
 if %winbuild% LSS 10240 if defined ltscfound (
 %eline%
-echo Installed Office appears to be from the Volume channel %ltsc19%%ltsc21%%ltsc24%,
-echo which is not officially supported on your Windows build version %winbuild%.
-echo Aborting...
+echo 已安裝的 Office 似乎來自大量授權通道 %ltsc19%%ltsc21%%ltsc24%，
+echo 而您的 Windows 組建版本 %winbuild% 未正式支援它。
+echo 正在中止...
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
@@ -472,10 +472,10 @@ if %winbuild% LSS 9200 if %verchk% GTR 12527 set unsupbuild=1
 
 if defined unsupbuild (
 %eline%
-echo Unsupported Office %verchk% is installed on your Windows build version %winbuild%.
-echo Aborting...
+echo 您的 Windows 組建版本 %winbuild% 上安裝了不受支援的 Office %verchk%。
+echo 正在中止...
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 
@@ -484,10 +484,10 @@ for /f %%G in ('%psc% "[Guid]::NewGuid().Guid" ^| findstr /r "^[0123456789abcdef
 if not defined o_randguid (
 set "o_randguid="
 %eline%
-echo Unable to generate GUID with PowerShell.
-echo Aborting...
+echo 無法使用 PowerShell 產生 GUID。
+echo 正在中止...
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto dk_done
 )
 md "%SystemRoot%\Temp\%o_randguid%\"
@@ -499,25 +499,25 @@ md "%SystemRoot%\Temp\%o_randguid%\"
 cls
 set fixes=
 if not defined terminal mode 76, 25
-title  Change Office Edition %masver%
+title  變更 Office 版本 %masver%
 echo:
 echo:
 echo:
 echo:
 echo         ____________________________________________________________
 echo:
-echo                 [1] Change all editions
-echo                 [2] Add edition
-echo                 [3] Remove edition
+echo                 [1] 變更所有版本
+echo                 [2] 新增版本
+echo                 [3] 移除版本
 echo:
-echo                 [4] Add/Remove apps
+echo                 [4] 新增／移除應用程式
 echo                 ____________________________________________
 echo:
-echo                 [5] Change Office Update Channel
+echo                 [5] 變更 Office 更新通道
 echo                 [0] %_exitmsg%
 echo         ____________________________________________________________
 echo: 
-call :dk_color2 %_White% "           " %_Green% "Choose a menu option using your keyboard [1,2,3,4,5,0]"
+call :dk_color2 %_White% "           " %_Green% "請以鍵盤選擇選單選項 [1,2,3,4,5,0]"
 choice /C:123450 /N
 set _el=!errorlevel!
 if !_el!==6  exit /b
@@ -541,28 +541,28 @@ goto :oe_goback
 cls
 if not defined terminal mode 76, 25
 if %change%==1 (
-title  Change all editions %masver%
+title  變更所有版本 %masver%
 ) else (
-title  Add edition %masver%
+title  新增版本 %masver%
 )
 
 echo:
 echo:
 echo:
 echo:
-echo                 O365/Mondo editions have the latest features.     
+echo                 O365/Mondo 版本擁有最新功能。     
 echo         ____________________________________________________________
 echo:
-echo                 [1] Office Suites     - Retail
-echo                 [2] Office Suites     - Volume
-echo                 [3] Office SingleApps - Retail
-echo                 [4] Office SingleApps - Volume
+echo                 [1] Office 套裝     - 零售版
+echo                 [2] Office 套裝     - 大量授權版
+echo                 [3] Office 單一應用程式 - 零售版
+echo                 [4] Office 單一應用程式 - 大量授權版
 echo                 ____________________________________________
 echo:
-echo                 [0] Go Back
+echo                 [0] 返回
 echo         ____________________________________________________________
 echo: 
-call :dk_color2 %_White% "            " %_Green% "Choose a menu option using your keyboard [1,2,3,4,0]"
+call :dk_color2 %_White% "            " %_Green% "請以鍵盤選擇選單選項 [1,2,3,4,0]"
 choice /C:12340 /N
 set _el=!errorlevel!
 if !_el!==5  goto :oemenu
@@ -580,7 +580,7 @@ cls
 set editedition=
 call :ch_getinfo
 call :oe_tempcleanup
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':getlist\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':getlist\:.*';. ([scriptblock]::Create($f[1]))"
 
 :oe_editionchange
 
@@ -592,9 +592,9 @@ mode 98, 45
 
 if not exist %SystemRoot%\Temp\%o_randguid%\%list%.txt (
 %eline%
-echo Failed to generate available editions list.
+echo 無法產生可用版本清單。
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto :oe_goback
 )
 
@@ -606,10 +606,10 @@ set targetedition=
 
 %line%
 echo:
-call :dk_color %Gray% "Installed Office editions: %_oIds%"
-call :dk_color %Gray% "You can select one of the following Office Editions."
+call :dk_color %Gray% "已安裝的 Office 版本： %_oIds%"
+call :dk_color %Gray% "您可以選擇下列其中一種 Office 版本。"
 if %winbuild% LSS 10240 (
-echo Unsupported products such as 2019/2021/2024 are excluded from this list.
+echo 2019/2021/2024 等不受支援的產品已從此清單中排除。
 ) else (
 for %%# in (2019 2021 2024) do (
 find /i "%%#" "%SystemRoot%\Temp\%o_randguid%\%list%.txt" %nul1% || (
@@ -633,9 +633,9 @@ set targetedition!counter!=%%A
 
 %line%
 echo:
-echo [0]  Go Back
+echo [0]  返回
 echo:
-call :dk_color %_Green% "Enter an option number using your keyboard and press Enter to confirm:"
+call :dk_color %_Green% "請以鍵盤輸入選項數字，並按 Enter 確認："
 set /p inpt=
 if "%inpt%"=="" goto :oe_editionchange
 if "%inpt%"=="0" (call :oe_tempcleanup & goto :oe_edition)
@@ -653,12 +653,12 @@ cls
 set suites=
 echo %list% | find /i "Suites" %nul1% && (
 set suites=1
-%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':getappnames\:.*';. ([scriptblock]::Create($f[1]))"
+%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':getappnames\:.*';. ([scriptblock]::Create($f[1]))"
 if not exist %SystemRoot%\Temp\%o_randguid%\getAppIds.txt (
 %eline%
-echo Failed to generate available apps list.
+echo 無法產生可用應用程式清單。
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto :oe_goback
 )
 )
@@ -698,8 +698,8 @@ if not defined terminal mode 98, 32
 
 %line%
 echo:
-call :dk_color %Gray% "Target edition: %targetedition%"
-call :dk_color %Gray% "To exclude the apps listed below from installation, toggle them from On to Off."
+call :dk_color %Gray% "目標版本： %targetedition%"
+call :dk_color %Gray% "若要排除下方列出的應用程式，請將它們從 On 切換為 Off。"
 if defined editedition call :dk_color %Gray% "Note: The On/Off status below does not reflect the current status of the installed apps."
 %line%
 if defined suites echo:
@@ -719,11 +719,11 @@ if defined OneDrive_st          echo [D] OneDrive            : %OneDrive_st%
 if defined Teams_st             echo [T] Teams               : %Teams_st%
 %line%
 echo:
-echo [1] Continue
-echo [0] Go Back
+echo [1] 繼續
+echo [0] 返回
 %line%
 echo:
-call :dk_color %_Green% "Choose a menu option using your keyboard:"
+call :dk_color %_Green% "請以鍵盤選擇選單選項："
 choice /C:AENOPJRVWLKDT10 /N
 set _el=!errorlevel!
 if !_el!==15 goto :oemenu
@@ -816,8 +816,8 @@ if /i "%_lang%"=="%%#" set langmatched=1
 )
 if not defined langmatched (
 %eline%
-echo %_lang% language is not available for Project/Visio apps.
-call :dk_color %Blue% "Install Office in the supported language for Project/Visio from the below URL."
+echo %_lang% 語言不適用於 Project/Visio 應用程式。
+call :dk_color %Blue% "請從下方網址，以 Project/Visio 支援的語言安裝 Office。"
 set fixes=%fixes% %mas%genuine-installation-media
 call :dk_color %_Yellow% "%mas%genuine-installation-media"
 goto :oe_goback
@@ -838,7 +838,7 @@ set "c2rcommand=!c2rcommand! productstoremove=AllProducts"
 )
 
 echo:
-echo Running the below command, please wait...
+echo 正在執行下方命令，請稍候...
 echo:
 echo %c2rcommand%
 %c2rcommand%
@@ -874,15 +874,15 @@ echo %_AudienceData% | find /i "LTSC" %nul% && set suggestchannel=Production::CC
 )
 
 if defined suggestchannel (
-call :dk_color %Gray% "Mismatch found in update channel and installed product."
-call :dk_color %Blue% "It is recommended to change the update channel to [!suggestchannel!] from the previous menu."
+call :dk_color %Gray% "更新通道與已安裝的產品不相符。"
+call :dk_color %Blue% "建議從上一層選單將更新通道變更為 [!suggestchannel!]。"
 )
 echo:
 )
-call :dk_color %Gray% "To activate Office, run the activation option from the main menu."
+call :dk_color %Gray% "若要啟用 Office，請從主選單執行啟用選項。"
 ) else (
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 )
 
 call :oe_tempcleanup
@@ -895,7 +895,7 @@ goto :oe_goback
 :oe_editedition
 
 cls
-title  Add/Remove Apps %masver%
+title  新增／移除應用程式 %masver%
 
 call :oe_chkinternet
 if not defined _int (
@@ -918,7 +918,7 @@ set targetedition=
 
 %line%
 echo:
-call :dk_color %Gray% "You can edit [add/remove apps] one of the following Office editions."
+call :dk_color %Gray% "您可以為下列其中一種 Office 版本編輯 [新增／移除應用程式]。"
 %line%
 echo:
 
@@ -930,9 +930,9 @@ set targetedition!counter!=%%A
 
 %line%
 echo:
-echo [0]  Go Back
+echo [0]  返回
 echo:
-call :dk_color %_Green% "Enter an option number using your keyboard and press Enter to confirm:"
+call :dk_color %_Green% "請以鍵盤輸入選項數字，並按 Enter 確認："
 set /p inpt=
 if "%inpt%"=="" goto :oe_editedition
 if "%inpt%"=="0" goto :oemenu
@@ -954,7 +954,7 @@ goto :oe_excludeappspre
 
 :oe_removeedition
 
-title  Remove Office editions %masver%
+title  移除 Office 版本 %masver%
 
 call :ch_getinfo
 
@@ -968,8 +968,8 @@ for %%A in (%_oIds%) do (set /a counter+=1)
 
 if !counter! LEQ 1 (
 echo:
-echo Only "%_oIds%" product is installed.
-echo This option is available only when multiple products are installed.
+echo 只安裝了「%_oIds%」產品。
+echo 此選項只有在安裝多個產品時才能使用。
 goto :oe_goback
 )
 
@@ -982,7 +982,7 @@ set targetedition=
 
 %line%
 echo:
-call :dk_color %Gray% "You can uninstall one of the following Office editions."
+call :dk_color %Gray% "您可以解除安裝下列其中一種 Office 版本。"
 %line%
 echo:
 
@@ -994,9 +994,9 @@ set targetedition!counter!=%%A
 
 %line%
 echo:
-echo [0]  Go Back
+echo [0]  返回
 echo:
-call :dk_color %_Green% "Enter an option number using your keyboard and press Enter to confirm:"
+call :dk_color %_Green% "請以鍵盤輸入選項數字，並按 Enter 確認："
 set /p inpt=
 if "%inpt%"=="" goto :oe_removeedition
 if "%inpt%"=="0" goto :oemenu
@@ -1013,7 +1013,7 @@ call :oe_getlangs %targetedition%
 set "c2rcommand="%_c2rExe%" platform=%_oArch% productstoremove=%targetedition%.16_%_allLangs%"
 
 echo:
-echo Running the below command, please wait...
+echo 正在執行下方命令，請稍候...
 echo:
 echo %c2rcommand%
 %c2rcommand%
@@ -1021,7 +1021,7 @@ echo %c2rcommand%
 if %errorlevel% NEQ 0 (
 echo:
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 )
 
 goto :oe_goback
@@ -1032,7 +1032,7 @@ goto :oe_goback
 
 :oe_changeupdchnl
 
-title  Change Office update channel %masver%
+title  變更 Office 更新通道 %masver%
 call :ch_getinfo
 
 cls
@@ -1048,14 +1048,14 @@ goto :oe_goback
 if %winbuild% LSS 10240 (
 echo %_oIds% | findstr "2019 2021 2024" %nul% && (
 %eline%
-echo Installed Office editions: %_oIds%
-echo Unsupported Office edition is installed on your Windows build version %winbuild%.
+echo 已安裝的 Office 版本： %_oIds%
+echo 您的 Windows 組建版本 %winbuild% 上安裝了不受支援的 Office 版本。
 goto :oe_goback
 )
 if defined ltscfound (
 %eline%
-echo Installed Office update channel: %ltsc19%%ltsc21%%ltsc24%
-echo Unsupported Office update channel is installed on your Windows build version %winbuild%.
+echo 已安裝的 Office 更新通道： %ltsc19%%ltsc21%%ltsc24%
+echo 您的 Windows 組建版本 %winbuild% 上安裝了不受支援的 Office 更新通道。
 goto :oe_goback
 )
 )
@@ -1071,8 +1071,8 @@ set targetchannel=
 
 %line%
 echo:
-call :dk_color %Gray% "Installed update channel: %_AudienceData%, %_version%, Client: %_clversion%"
-call :dk_color %Gray% "Installed Office editions: %_oIds%"
+call :dk_color %Gray% "已安裝的更新通道： %_AudienceData%, %_version%, Client: %_clversion%"
+call :dk_color %Gray% "已安裝的 Office 版本： %_oIds%"
 %line%
 echo:
 
@@ -1117,10 +1117,10 @@ if defined bypass set bypassFFN=!bypassFFN!%%A
 
 %line%
 echo:
-echo [R]  Learn about update channels
-echo [0]  Go back
+echo [R]  了解更新通道
+echo [0]  返回
 echo:
-call :dk_color %_Green% "Enter an option number using your keyboard and press Enter to confirm:"
+call :dk_color %_Green% "請以鍵盤輸入選項數字，並按 Enter 確認："
 set /p inpt=
 if "%inpt%"=="" goto :oe_changeupdchnl
 if "%inpt%"=="0" goto :oemenu
@@ -1138,12 +1138,12 @@ if not defined terminal mode 105, 32
 ::  Get build number for the target FFN, using build number with OfficeC2RClient.exe command to trigger updates provides accurate results
 
 set build=
-for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!') -split ':getbuild\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (set build=%%a)
+for /f "delims=" %%a in ('%psc% "$f=[IO.File]::ReadAllText('!_batp!', [Text.Encoding]::GetEncoding(950)) -split ':getbuild\:.*';. ([scriptblock]::Create($f[1]))" %nul6%') do (set build=%%a)
 echo "%build%" | find /i "16." %nul% || set build=
 
 echo:
 for /f "tokens=1 delims=-" %%A in ("%targetchannel%") do (echo Target update channel: %%A)
-echo Target build number: %build%
+echo 目標組建編號： %build%
 echo: %bypassFFN% | find /i "%targetFFN%" %nul% && goto :oe_changeunoff
 
 call :oe_cleanupreg
@@ -1154,12 +1154,12 @@ set "updcommand="%_c2rCexe%" /update user"
 ) else (
 set "updcommand="%_c2rCexe%" /update user updatetoversion=%build%"
 )
-echo Running the below command to trigger updates...
+echo 正在執行下方命令以觸發更新...
 echo:
 echo %updcommand%
 %updcommand%
 echo:
-echo Check this webpage for help - %mas%troubleshoot
+echo 請查看此網頁尋求協助 - %mas%troubleshoot
 goto :oe_goback
 
 ::=======================
@@ -1175,16 +1175,16 @@ echo %targetchannel% | find /i "2024 VL" %nul% && (for %%A in (%_oIds%) do (echo
 
 if defined abortchange (
 %eline%
-echo Mismatch found in installed Office products and target update channel. Aborting...
-echo Non-perpetual Office products are not suppported with Perpetual VL update channels.
+echo 已安裝的 Office 產品與目標更新通道不相符。正在中止...
+echo 永續大量授權更新通道不支援非永續的 Office 產品。
 goto :oe_goback
 )
 
 if not defined build (
 %eline%
-call :dk_color %Red% "Failed to detect build number for the target FFN."
+call :dk_color %Red% "無法偵測目標 FFN 的組建編號。"
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto :oe_goback
 )
 
@@ -1197,7 +1197,7 @@ echo %targetchannel% | find /i "2019 VL" %nul% && (
 for %%A in (en-gb es-mx fr-ca) do (
 echo %_allLangs% | find /i "%%A" %nul% && (
 %eline%
-echo [%%A] language is not supported on the Office 2019 Perpetual VL update channel. Aborting...
+echo [%%A] 語言不受 Office 2019 永續大量授權更新通道支援。正在中止...
 goto :oe_goback
 )
 )
@@ -1208,9 +1208,9 @@ set "c2rclientupdate=!c2rcommand! scenario=CLIENTUPDATE"
 
 if %clverchk% LSS %buildchk% (
 echo:
-call :dk_color %Blue% "Do not terminate the operation before it completes..."
+call :dk_color %Blue% "請勿在作業完成前將它終止..."
 echo:
-echo Updating Office C2R client with the command below, please wait...
+echo 正在使用下方命令更新 Office C2R 用戶端，請稍候...
 echo:
 echo %c2rclientupdate%
 %c2rclientupdate%
@@ -1219,15 +1219,15 @@ for /l %%i in (1,1,30) do (if !clverchk! LSS %buildchk% (call :ch_getinfo&timeou
 
 if %clverchk% LSS %buildchk% (
 echo:
-call :dk_color %Red% "Failed to update Office C2R client. Aborting..."
+call :dk_color %Red% "更新 Office C2R 用戶端失敗。正在中止..."
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 goto :oe_goback
 )
 
 call :oe_cleanupreg
 
-echo Running the below command to change update channel, please wait...
+echo 正在執行下方命令以變更更新通道，請稍候...
 echo:
 echo %c2rcommand%
 %c2rcommand%
@@ -1236,10 +1236,10 @@ timeout /t 10 %nul%
 
 echo:
 if %errorcode% EQU 0 (
-call :dk_color %Gray% "Now run the Office activation option from the main menu."
+call :dk_color %Gray% "現在請從主選單執行 Office 啟用選項。"
 ) else (
 set fixes=%fixes% %mas%troubleshoot
-call :dk_color2 %Blue% "Check this webpage for help - " %_Yellow% " %mas%troubleshoot"
+call :dk_color2 %Blue% "請查看此網頁尋求協助 - " %_Yellow% " %mas%troubleshoot"
 )
 
 ::========================================================================================================================================
@@ -1250,18 +1250,18 @@ call :oe_tempcleanup
 
 echo:
 if defined fixes (
-call :dk_color %White% "Follow ALL the ABOVE blue lines.   "
-call :dk_color2 %Blue% "Press [1] to Open Support Webpage " %Gray% " Press [0] to Go Back"
+call :dk_color %White% "請遵循上方所有藍色文字的指示。   "
+call :dk_color2 %Blue% "按 [1] 開啟支援網頁 " %Gray% " 按 [0] 返回"
 choice /C:10 /N
 if !errorlevel!==2 goto :oemenu
 if !errorlevel!==1 (start %selfgit% & start %github% & for %%# in (%fixes%) do (start %%#))
 )
 
 if defined terminal (
-call :dk_color %_Yellow% "Press [0] key to go back..."
+call :dk_color %_Yellow% "按 [0] 鍵返回..."
 choice /c 0 /n
 ) else (
-call :dk_color %_Yellow% "Press any key to go back..."
+call :dk_color %_Yellow% "按任意鍵返回..."
 pause %nul1%
 )
 goto :oemenu
@@ -1275,8 +1275,8 @@ goto :oemenu
 ::  https://learn.microsoft.com/en-us/microsoft-365-apps/updates/change-update-channels#considerations-when-changing-channels
 
 echo:
-echo Cleaning Office update registry keys...
-echo Adding new update channel to registry keys...
+echo 正在清理 Office 更新登錄檔機碼...
+echo 正在將新的更新通道加入登錄檔機碼...
 echo:
 
 %nul% reg add %o16c2r_reg%\Configuration /v CDNBaseUrl /t REG_SZ /d "https://officecdn.microsoft.com/pr/%targetFFN%" /f
@@ -1421,8 +1421,8 @@ if !errorlevel!==0 (set _int=1)
 
 if not defined _int (
 %eline%
-call :dk_color %Red% "Internet is not connected."
-call :dk_color %Blue% "Internet is required for this operation."
+call :dk_color %Red% "網際網路未連線。"
+call :dk_color %Blue% "此作業需要網際網路。"
 )
 exit /b
 
@@ -1590,11 +1590,11 @@ set "_Yellow="Black" "Yellow""
 set "nceline=echo: &echo ==== ERROR ==== &echo:"
 set "eline=echo: &call :dk_color %Red% "==== ERROR ====" &echo:"
 if %~z0 GEQ 200000 (
-set "_exitmsg=Go back"
-set "_fixmsg=Go back to Main Menu, select Troubleshoot and run Fix Licensing option."
+set "_exitmsg=返回"
+set "_fixmsg=請回到主選單，選擇疑難排解，然後執行修復授權選項。"
 ) else (
-set "_exitmsg=Exit"
-set "_fixmsg=In MAS folder, run Troubleshoot script and select Fix Licensing option."
+set "_exitmsg=離開"
+set "_fixmsg=請在 MAS 資料夾執行疑難排解腳本，並選擇修復授權選項。"
 )
 exit /b
 
@@ -1620,10 +1620,10 @@ set spperror=%errorlevel%
 
 if %spperror% NEQ 1056 if %spperror% NEQ 0 (
 %eline%
-echo sc start %_slser% [Error Code: %spperror%]
+echo sc start %_slser% [錯誤碼: %spperror%]
 if %spperror% EQU 1053 (
-call :dk_color %Blue% "Reboot your machine using the restart option and try again."
-call :dk_color %Blue% "If it still does not work, go back to Main Menu, select Troubleshoot and run Fix WPA Registry option."
+call :dk_color %Blue% "請使用「重新啟動」選項重新開機，然後再試一次。"
+call :dk_color %Blue% "如果仍然無效，請回到主選單，選擇疑難排解，然後執行修復 WPA 登錄檔選項。"
 )
 )
 
@@ -1672,18 +1672,18 @@ echo:
 if %_unattended%==1 timeout /t 2 & exit /b
 
 if defined fixes (
-call :dk_color %White% "Follow ALL the ABOVE blue lines.   "
-call :dk_color2 %Blue% "Press [1] to Open Support Webpage " %Gray% " Press [0] to Go Back"
+call :dk_color %White% "請遵循上方所有藍色文字的指示。   "
+call :dk_color2 %Blue% "按 [1] 開啟支援網頁 " %Gray% " 按 [0] 返回"
 choice /C:10 /N
 if !errorlevel!==2 exit /b
 if !errorlevel!==1 (start %selfgit% & start %github% & for %%# in (%fixes%) do (start %%#))
 )
 
 if defined terminal (
-call :dk_color %_Yellow% "Press [0] key to %_exitmsg%..."
+call :dk_color %_Yellow% "按 [0] 鍵以%_exitmsg%..."
 choice /c 0 /n
 ) else (
-call :dk_color %_Yellow% "Press any key to %_exitmsg%..."
+call :dk_color %_Yellow% "按任意鍵以%_exitmsg%..."
 pause %nul1%
 )
 
