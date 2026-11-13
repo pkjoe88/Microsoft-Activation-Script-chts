@@ -30,8 +30,13 @@
 ### 方法 2 - 傳統方式（Windows Vista 及之後版本）
 
 1.   下載腳本：
-      *   [**MAS_AIO.cmd**](https://dev.azure.com/massgrave/Microsoft-Activation-Scripts/_apis/git/repositories/Microsoft-Activation-Scripts/items?path=/MAS/All-In-One-Version-KL/MAS_AIO.cmd&download=true)（直接下載腳本）
-      *   [**MAS_AIO.zip**](https://dev.azure.com/massgrave/Microsoft-Activation-Scripts/_apis/git/repositories/Microsoft-Activation-Scripts/items?$format=zip)（若直接下載腳本被瀏覽器擋下）
+      *   **繁體中文版（推薦）**：
+          *   [**MAS_AIO.cmd**](https://github.com/pkjoe88/Microsoft-Activation-Script-chts/releases/latest/download/MAS_AIO.cmd)（直接下載繁中版腳本）
+          *   [**MAS_AIO.zip**](https://github.com/pkjoe88/Microsoft-Activation-Script-chts/releases/latest/download/MAS_AIO.zip)（若直接下載腳本被瀏覽器或防毒軟體擋下）
+          *   [**專案完整壓縮檔 .zip**](https://github.com/pkjoe88/Microsoft-Activation-Script-chts/archive/refs/heads/master.zip)（包含所有獨立版啟用器與工具）
+      *   **原始英文版**：
+          *   [**MAS_AIO.cmd (官方英文)**](https://dev.azure.com/massgrave/Microsoft-Activation-Scripts/_apis/git/repositories/Microsoft-Activation-Scripts/items?path=/MAS/All-In-One-Version-KL/MAS_AIO.cmd&download=true)
+          *   [**MAS_AIO.zip (官方英文)**](https://dev.azure.com/massgrave/Microsoft-Activation-Scripts/_apis/git/repositories/Microsoft-Activation-Scripts/items?$format=zip)
 2.   執行 `MAS_AIO.cmd` 檔案。
 3.   在出現的選單中，輸入**綠色**選項對應的數字。
 
