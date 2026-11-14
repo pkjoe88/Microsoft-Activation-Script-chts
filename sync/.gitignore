@@ -1,0 +1,4 @@
+# 同步產物，不進版控
+*.zip
+untranslated_new.log
+__pycache__/

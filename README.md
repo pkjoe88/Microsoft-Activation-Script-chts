@@ -91,5 +91,18 @@
 
 ---
 
+### 上游同步與監控
+
+本繁中版由 `sync/` 管線自動重建：以官方英文原文 + `sync/translation_map.txt`
+套出繁中檔案，並驗證輸出與已提交版本逐位元組一致。
+
+- 想確認有沒有新版本：`python sync\sync_upstream.py --check-only`
+- 每日自動監控：執行 `sync\install_task.bat`（偵測到更新才發 LINE，不會自動改檔）
+- 同步並發佈：`python sync\sync_upstream.py --commit --release`
+
+詳細規則與限制見 [`sync/README.md`](sync/README.md)。
+
+---
+
 最新版本：3.14  
 發布日期：2026-11-11
